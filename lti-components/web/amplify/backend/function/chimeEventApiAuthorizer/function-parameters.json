@@ -1,0 +1,6 @@
+{
+  "lambdaLayers": [],
+  "apichimeLtiApiLtiToolPublicKeyUrl": {
+    "Fn::GetAtt": ["apichimeLtiApi", "Outputs.LtiToolPublicKeyUrl"]
+  }
+}

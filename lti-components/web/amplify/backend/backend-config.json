@@ -1,0 +1,382 @@
+{
+  "analytics": {
+    "chimeMeetingEventsProcessing": {
+      "service": "S3FirehoseEventBridge",
+      "providerPlugin": "awscloudformation"
+    }
+  },
+  "custom": {
+    "mappings": {
+      "service": "EventSourceMappings",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [
+        {
+          "category": "function",
+          "resourceName": "chimeMetricsResultProcessor",
+          "attributes": [
+            "SqsAthenaJobsQueueArn",
+            "Arn"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "chimeMetricsQueryTrigger",
+          "attributes": [
+            "SqsChimeEventBridgeTriggerArn",
+            "Arn"
+          ]
+        }
+      ]
+    }
+  },
+  "hosting": {
+    "S3AndCloudFront": {
+      "service": "S3AndCloudFront",
+      "providerPlugin": "awscloudformation"
+    }
+  },
+  "security": {
+    "tokenSecret": {
+      "service": "SecretManager",
+      "providerPlugin": "awscloudformation"
+    }
+  },
+  "storage": {
+    "dynamoEventGroups": {
+      "service": "DynamoDB",
+      "providerPlugin": "awscloudformation"
+    },
+    "dynamoEvents": {
+      "service": "DynamoDB",
+      "providerPlugin": "awscloudformation"
+    },
+    "dynamoPlatforms": {
+      "service": "DynamoDB",
+      "providerPlugin": "awscloudformation"
+    },
+    "dynamoEventsMetrics": {
+      "service": "DynamoDB",
+      "providerPlugin": "awscloudformation"
+    }
+  },
+  "api": {
+    "chimeEventApi": {
+      "service": "API Gateway",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [
+        {
+          "category": "function",
+          "resourceName": "chimeEventApiAuthorizer",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "chimeEventApiPlatform",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "chimeEventApiEventGroup",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "chimeEventApiEvent",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "chimeEventApiJoin",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "chimeEventApiSetup",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        }
+      ]
+    },
+    "chimeLtiApi": {
+      "service": "API Gateway",
+      "providerPlugin": "awscloudformation",
+      "dependsOn": [
+        {
+          "category": "function",
+          "resourceName": "chimeLtiApiAuth",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "chimeLtiApiLogin",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "chimeLtiApiJwk",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        }
+      ]
+    }
+  },
+  "function": {
+    "chimeEventApiPlatform": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "storage",
+          "resourceName": "dynamoPlatforms",
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "attributeEnvMap": {
+            "Name": "TABLE_NAME",
+            "Arn": "TABLE_ARN"
+          }
+        }
+      ]
+    },
+    "chimeEventApiEventGroup": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "storage",
+          "resourceName": "dynamoEventGroups",
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "attributeEnvMap": {
+            "Name": "TABLE_NAME",
+            "Arn": "TABLE_ARN"
+          }
+        }
+      ]
+    },
+    "chimeEventApiEvent": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "storage",
+          "resourceName": "dynamoEvents",
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "attributeEnvMap": {
+            "Name": "TABLE_NAME",
+            "Arn": "TABLE_ARN"
+          }
+        },
+        {
+          "category": "storage",
+          "resourceName": "dynamoEventsMetrics",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        }
+      ]
+    },
+    "chimeEventApiAuthorizer": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "api",
+          "resourceName": "chimeLtiApi",
+          "attributes": [
+            "LtiToolPublicKeyUrl"
+          ]
+        }
+      ]
+    },
+    "chimeLtiApiAuth": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "hosting",
+          "resourceName": "S3AndCloudFront",
+          "attributes": [
+            "CloudFrontSecureURL"
+          ]
+        },
+        {
+          "category": "storage",
+          "resourceName": "dynamoPlatforms",
+          "attributes": [
+            "Arn",
+            "Name"
+          ]
+        },
+        {
+          "category": "storage",
+          "resourceName": "dynamoEventGroups",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        },
+        {
+          "category": "security",
+          "resourceName": "tokenSecret",
+          "attributes": [
+            "Arn",
+            "Name"
+          ]
+        },
+        {
+          "category": "analytics",
+          "resourceName": "chimeMeetingEventsProcessing",
+          "attributes": [
+            "AnalyticsBucketUserFolderName",
+            "AnalyticsBucketName",
+            "AnalyticsBucketArn"
+          ]
+        }
+      ]
+    },
+    "chimeLtiApiLogin": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "storage",
+          "resourceName": "dynamoPlatforms",
+          "attributes": [
+            "Name",
+            "Arn"
+          ]
+        }
+      ]
+    },
+    "chimeLtiApiJwk": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "security",
+          "resourceName": "tokenSecret",
+          "attributes": [
+            "Arn",
+            "Name"
+          ]
+        }
+      ]
+    },
+    "chimeEventApiJoin": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda"
+    },
+    "chimeEventApiSetup": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "analytics",
+          "resourceName": "chimeMeetingEventsProcessing",
+          "attributes": [
+            "AnalyticsBucketEventsFolderName",
+            "AnalyticsBucketName",
+            "AnalyticsBucketArn"
+          ]
+        }
+      ]
+    },
+    "chimeMetricsQueryTrigger": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "analytics",
+          "resourceName": "chimeMeetingEventsProcessing",
+          "attributes": [
+            "NamedQueryIdPairMeetingEvents",
+            "NamedQueryIdAggregateMeetingEvents",
+            "AnalyticsResultOutputLocation",
+            "AnalyticsBucketArn",
+            "AnalyticsDatabaseName",
+            "AnalyticsWorkGroupName"
+          ]
+        },
+        {
+          "category": "function",
+          "resourceName": "chimeMetricsResultProcessor",
+          "attributes": [
+            "SqsAthenaJobsQueueUrl",
+            "SqsAthenaJobsQueueArn"
+          ]
+        }
+      ]
+    },
+    "chimeMetricsResultProcessor": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "dependsOn": [
+        {
+          "category": "storage",
+          "resourceName": "dynamoEventsMetrics",
+          "attributes": [
+            "Name",
+            "Arn"
+          ],
+          "attributeEnvMap": {
+            "Name": "TABLE_NAME",
+            "Arn": "TABLE_ARN"
+          }
+        },
+        {
+          "category": "analytics",
+          "resourceName": "chimeMeetingEventsProcessing",
+          "attributes": [
+            "AnalyticsResultOutputLocationArn",
+            "AnalyticsDatabaseName",
+            "AnalyticsWorkGroupName"
+          ]
+        }
+      ]
+    }
+  }
+}

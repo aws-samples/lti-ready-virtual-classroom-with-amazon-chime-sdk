@@ -1,0 +1,37 @@
+{
+  "name": "frontend-cdk",
+  "version": "0.1.0",
+  "bin": {
+    "frontend-cdk": "bin/frontend-cdk.js"
+  },
+  "scripts": {
+    "build": "cd .. && cd react-meeting-demo && npm install && cd demo/meeting && npm run build && cd ../../.. && cd frontend-cdk && npm run build:fast",
+    "build:fast": "npm install && tsc",
+    "watch": "tsc -w",
+    "test": "jest",
+    "cdk": "cdk"
+  },
+  "author": {
+    "name": "Amazon Web Services",
+    "url": "https://aws.amazon.com",
+    "organization": true
+  },
+  "devDependencies": {
+    "@aws-cdk/assert": "1.90.0",
+    "@types/jest": "^26.0.10",
+    "@types/node": "10.17.27",
+    "aws-cdk": "1.90.0",
+    "jest": "^26.4.2",
+    "ts-jest": "^26.2.0",
+    "ts-node": "^9.0.0",
+    "typescript": "~3.9.7"
+  },
+  "dependencies": {
+    "@aws-cdk/aws-cognito": "1.90.0",
+    "@aws-cdk/aws-s3": "1.90.0",
+    "@aws-cdk/aws-s3-deployment": "1.90.0",
+    "@aws-cdk/core": "1.90.0",
+    "@aws-cdk/pipelines": "1.90.0",
+    "source-map-support": "^0.5.16"
+  }
+}

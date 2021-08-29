@@ -1,0 +1,66 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Chime LTI > Secret used by LTI client to sign its JWK tokens.",
+  "Parameters": {
+    "env": {
+      "Type": "String"
+    },
+    "functionchimeMetricsResultProcessorSqsAthenaJobsQueueArn": {
+      "Type": "String"
+    },
+    "functionchimeMetricsResultProcessorArn": {
+      "Type": "String"
+    },
+    "functionchimeMetricsQueryTriggerSqsChimeEventBridgeTriggerArn": {
+      "Type": "String"
+    },
+    "functionchimeMetricsQueryTriggerArn": {
+      "Type": "String"
+    }
+  },
+  "Conditions": {
+    "ShouldNotCreateEnvResources": {
+      "Fn::Equals": [
+        {
+          "Ref": "env"
+        },
+        "NONE"
+      ]
+    }
+  },
+  "Resources": {
+    "EventBridgeSqsSourceMapping": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "Properties": {
+        "BatchSize": 10,
+        "Enabled": true,
+        "EventSourceArn": {
+          "Ref": "functionchimeMetricsQueryTriggerSqsChimeEventBridgeTriggerArn"
+        },
+        "FunctionName": {
+          "Ref": "functionchimeMetricsQueryTriggerArn"
+        }
+      }
+    },
+    "AthenaSqsSourceMapping": {
+      "Type": "AWS::Lambda::EventSourceMapping",
+      "Properties": {
+        "BatchSize": 10,
+        "Enabled": true,
+        "EventSourceArn": {
+          "Ref": "functionchimeMetricsResultProcessorSqsAthenaJobsQueueArn"
+        },
+        "FunctionName": {
+          "Ref": "functionchimeMetricsResultProcessorArn"
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "Region": {
+      "Value": {
+        "Ref": "AWS::Region"
+      }
+    }
+  }
+}

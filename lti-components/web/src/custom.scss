@@ -1,0 +1,43 @@
+.App {
+  align-items: center;
+  min-height: 100vh;
+  background-color: #282c34;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+}
+
+.App-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  color: white;
+}
+
+.Card-header {
+  align-items: left;
+  justify-content: left;
+}
+
+.nav-tabs > a {
+  border: medium none;
+  color: rgb(206, 206, 206);
+}
+
+.Lobby-Toolbar {
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+}
+
+.Lobby-EventPane {
+  color: rgb(15, 12, 49);
+  flex-direction: row;
+}
+
+.App-link {
+  color: #61dafb;
+}
+
+// Import Bootstrap and its default variables
+@import "~bootstrap/scss/bootstrap.scss";

@@ -1,0 +1,112 @@
+{
+    "paths": [
+        {
+            "name": "/platform/{platformId}",
+            "lambdaFunction": "chimeEventApiPlatform",
+            "privacy": {
+                "open": true
+            },
+            "policyResourceName": "/platform/*"
+        },
+        {
+            "name": "/eventGroup/{eventGroupId}",
+            "lambdaFunction": "chimeEventApiEventGroup",
+            "privacy": {
+                "open": true
+            },
+            "policyResourceName": "/eventGroup/*"
+        },
+        {
+            "name": "/events/{eventGroupId}/{eventId}",
+            "lambdaFunction": "chimeEventApiEvent",
+            "privacy": {
+                "open": true
+            },
+            "policyResourceName": "/events/*/*"
+        },
+        {
+            "name": "/join/{eventGroupId}/{eventId}",
+            "lambdaFunction": "chimeEventApiJoin",
+            "privacy": {
+                "open": true
+            },
+            "policyResourceName": "/join/*/*"
+        },
+        {
+            "name": "/setup/{eventGroupId}/{eventId}",
+            "lambdaFunction": "chimeEventApiSetup",
+            "privacy": {
+                "open": true
+            },
+            "policyResourceName": "/setup/*/*"
+        }
+    ],
+    "resourceName": "chimeEventApi",
+    "apiName": "chimeEventApi",
+    "functionArns": [
+        {
+            "lambdaFunction": "chimeEventApiPlatform"
+        },
+        {
+            "lambdaFunction": "chimeEventApiEventGroup"
+        },
+        {
+            "lambdaFunction": "chimeEventApiEvent"
+        },
+        {
+            "lambdaFunction": "chimeEventApiJoin"
+        },
+        {
+            "lambdaFunction": "chimeEventApiSetup"
+        }
+    ],
+    "privacy": {
+        "auth": 0,
+        "unauth": 0,
+        "authRoleName": "amplify-chime-iota-95609-authRole",
+        "unAuthRoleName": "amplify-chime-iota-95609-unauthRole"
+    },
+    "dependsOn": [
+        {
+            "category": "function",
+            "resourceName": "chimeEventApiPlatform",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        },
+        {
+            "category": "function",
+            "resourceName": "chimeEventApiEventGroup",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        },
+        {
+            "category": "function",
+            "resourceName": "chimeEventApiEvent",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        },
+        {
+            "category": "function",
+            "resourceName": "chimeEventApiJoin",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        },
+        {
+            "category": "function",
+            "resourceName": "chimeEventApiSetup",
+            "attributes": [
+                "Name",
+                "Arn"
+            ]
+        }
+    ],
+    "uuid": "192c0417"
+}

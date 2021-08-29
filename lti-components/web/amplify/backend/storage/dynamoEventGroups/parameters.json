@@ -1,0 +1,7 @@
+{
+    "tableName": "chimeEventGroups",
+    "partitionKeyName": "platformId",
+    "partitionKeyType": "S",
+    "sortKeyName": "eventGroupId",
+    "sortKeyType": "S"
+}

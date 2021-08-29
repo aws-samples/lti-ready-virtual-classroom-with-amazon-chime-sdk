@@ -1,0 +1,639 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Lambda Function resource stack creation using Amplify CLI",
+  "Parameters": {
+    "CloudWatchRule": {
+      "Type": "String",
+      "Default": "NONE",
+      "Description": "Schedule Expression"
+    },
+    "deploymentBucketName": {
+      "Type": "String"
+    },
+    "env": {
+      "Type": "String"
+    },
+    "s3Key": {
+      "Type": "String"
+    },
+    "analyticschimeMeetingEventsProcessingNamedQueryIdPairMeetingEvents": {
+      "Type": "String"
+    },
+    "analyticschimeMeetingEventsProcessingNamedQueryIdAggregateMeetingEvents": {
+      "Type": "String"
+    },
+    "analyticschimeMeetingEventsProcessingAnalyticsResultOutputLocation": {
+      "Type": "String"
+    },
+    "analyticschimeMeetingEventsProcessingAnalyticsDatabaseName": {
+      "Type": "String"
+    },
+    "analyticschimeMeetingEventsProcessingAnalyticsWorkGroupName": {
+      "Type": "String"
+    },
+    "functionchimeMetricsResultProcessorSqsAthenaJobsQueueArn": {
+      "Type": "String"
+    },
+    "functionchimeMetricsResultProcessorSqsAthenaJobsQueueUrl": {
+      "Type": "String"
+    },
+    "analyticschimeMeetingEventsProcessingAnalyticsBucketArn": {
+      "Type": "String"
+    }
+  },
+  "Conditions": {
+    "ShouldNotCreateEnvResources": {
+      "Fn::Equals": [
+        {
+          "Ref": "env"
+        },
+        "NONE"
+      ]
+    }
+  },
+  "Resources": {
+    "SqsChimeEventBridgeDeadletter": {
+      "Type": "AWS::SQS::Queue",
+      "Description": "Catches messages which fail to be processed by EventBridge rule."
+    },
+    "SqsChimeEventBridgeTriggerDeadletter": {
+      "Type": "AWS::SQS::Queue",
+      "Description": "Catches messages which fail to be processed by the trigger queue consumer (Lambda).",
+      "Properties": {
+        "FifoQueue": true,
+        "QueueName": {
+          "Fn::Join": [
+            "",
+            [
+              "amplify-chime-",
+              {
+                "Ref": "env"
+              },
+              "-SqsChimeEventBridgeTrigger-deadletter.fifo"
+            ]
+          ]
+        }
+      }
+    },
+    "SqsChimeEventBridgeTrigger": {
+      "Type": "AWS::SQS::Queue",
+      "Description": "Provides messages to indicate new Chime meeting events are ready to be processed by Athena in S3.",
+      "Properties": {
+        "QueueName": {
+          "Fn::Join": [
+            "",
+            [
+              "amplify-chime-",
+              {
+                "Ref": "env"
+              },
+              "-SqsChimeEventBridgeTrigger.fifo"
+            ]
+          ]
+        },
+        "FifoQueue": true,
+        "ContentBasedDeduplication": true,
+        "DelaySeconds": 330,
+        "RedrivePolicy": {
+          "deadLetterTargetArn": {
+            "Fn::GetAtt": [
+              "SqsChimeEventBridgeTriggerDeadletter",
+              "Arn"
+            ]
+          },
+          "maxReceiveCount": 2
+        }
+      }
+    },
+    "SqsQueuePolicy": {
+      "Type": "AWS::SQS::QueuePolicy",
+      "Properties": {
+        "PolicyDocument": {
+          "Id": "SqsChimeEventBridgeTriggerPolicy",
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "EventsToMyQueue",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "events.amazonaws.com"
+              },
+              "Action": "sqs:SendMessage",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "SqsChimeEventBridgeTrigger",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::GetAtt": [
+                    "SqsChimeEventBridgeDeadletter",
+                    "Arn"
+                  ]
+                }
+              ],
+              "Condition": {
+                "ArnEquals": {
+                  "aws:SourceArn": {
+                    "Fn::Sub": [
+                      "arn:aws:events:${region}:${account}:rule/*",
+                      {
+                        "region": {
+                          "Ref": "AWS::Region"
+                        },
+                        "account": {
+                          "Ref": "AWS::AccountId"
+                        },
+                        "lambda": {
+                          "Ref": "LambdaFunction"
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          ]
+        },
+        "Queues": [
+          {
+            "Ref": "SqsChimeEventBridgeTrigger"
+          },
+          {
+            "Ref": "SqsChimeEventBridgeDeadletter"
+          }
+        ]
+      }
+    },
+    "EventBridgeRuleSqs": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "Description": "Write meeting ids of Chime state change events to SQS queue",
+        "EventPattern": {
+          "source": [
+            "aws.chime"
+          ],
+          "detail-type": [
+            "Chime Meeting State Change"
+          ],
+          "detail": {
+            "eventType": [
+              "chime:MeetingStarted",
+              "chime:MeetingEnded",
+              "chime:AttendeeRemoved",
+              "chime:AttendeeJoined",
+              "chime:AttendeeLeft",
+              "chime:AttendeeDropped",
+              "chime:AttendeeVideoStarted",
+              "chime:AttendeeVideoStopped",
+              "chime:AttendeeContentVideoStarted",
+              "chime:AttendeeContentVideoStopped",
+              "chime:AttendeeScreenShareStarted",
+              "chime:AttendeeScreenShareStopped"
+            ]
+          }
+        },
+        "State": "ENABLED",
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "SqsChimeEventBridgeTrigger",
+                "Arn"
+              ]
+            },
+            "DeadLetterConfig": {
+              "Arn": {
+                "Fn::GetAtt": [
+                  "SqsChimeEventBridgeDeadletter",
+                  "Arn"
+                ]
+              }
+            },
+            "Id": "sqsChimeEvents",
+            "InputPath": "$.detail.externalMeetingId",
+            "SqsParameters": {
+              "MessageGroupId": {
+                "Fn::Join": [
+                  "",
+                  [
+                    "SqsChimeEventBridgeTrigger_",
+                    {
+                      "Ref": "env"
+                    }
+                  ]
+                ]
+              }
+            }
+          }
+        ]
+      }
+    },
+    "LambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Metadata": {
+        "aws:asset:path": "./src",
+        "aws:asset:property": "Code"
+      },
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "deploymentBucketName"
+          },
+          "S3Key": {
+            "Ref": "s3Key"
+          }
+        },
+        "Handler": "index.handler",
+        "FunctionName": {
+          "Fn::If": [
+            "ShouldNotCreateEnvResources",
+            "chimeMetricsQueryTrigger",
+            {
+              "Fn::Join": [
+                "",
+                [
+                  "chimeMetricsQueryTrigger",
+                  "-",
+                  {
+                    "Ref": "env"
+                  }
+                ]
+              ]
+            }
+          ]
+        },
+        "Environment": {
+          "Variables": {
+            "ENV": {
+              "Ref": "env"
+            },
+            "REGION": {
+              "Ref": "AWS::Region"
+            },
+            "QUERY_PAIR_EVENTS": {
+              "Ref": "analyticschimeMeetingEventsProcessingNamedQueryIdPairMeetingEvents"
+            },
+            "QUERY_AGGREGATE_EVENTS": {
+              "Ref": "analyticschimeMeetingEventsProcessingNamedQueryIdAggregateMeetingEvents"
+            },
+            "QUERY_OUTPUT_LOCATION": {
+              "Ref": "analyticschimeMeetingEventsProcessingAnalyticsResultOutputLocation"
+            },
+            "QUERY_DATABASE_NAME": {
+              "Ref": "analyticschimeMeetingEventsProcessingAnalyticsDatabaseName"
+            },
+            "QUERY_WORKGROUP_NAME": {
+              "Ref": "analyticschimeMeetingEventsProcessingAnalyticsWorkGroupName"
+            },
+            "QUERY_JOBS_QUEUE_URL": {
+              "Ref": "functionchimeMetricsResultProcessorSqsAthenaJobsQueueUrl"
+            },
+            "TRIGGER_QUEUE_URL": {
+              "Ref": "SqsChimeEventBridgeTrigger"
+            }
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "LambdaExecutionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Layers": [],
+        "Timeout": 25
+      }
+    },
+    "LambdaExecutionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": {
+          "Fn::If": [
+            "ShouldNotCreateEnvResources",
+            "chimeLambdaRoleb90d6968",
+            {
+              "Fn::Join": [
+                "",
+                [
+                  "chimeLambdaRoleb90d6968",
+                  "-",
+                  {
+                    "Ref": "env"
+                  }
+                ]
+              ]
+            }
+          ]
+        },
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "lambdaexecutionpolicy": {
+      "DependsOn": [
+        "LambdaExecutionRole"
+      ],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "lambda-execution-policy",
+        "Roles": [
+          {
+            "Ref": "LambdaExecutionRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+              ],
+              "Resource": {
+                "Fn::Sub": [
+                  "arn:aws:logs:${region}:${account}:log-group:/aws/lambda/${lambda}:log-stream:*",
+                  {
+                    "region": {
+                      "Ref": "AWS::Region"
+                    },
+                    "account": {
+                      "Ref": "AWS::AccountId"
+                    },
+                    "lambda": {
+                      "Ref": "LambdaFunction"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "Sid": "",
+              "Effect": "Allow",
+              "Action": [
+                "athena:GetWorkGroup",
+                "athena:GetNamedQuery",
+                "athena:StartQueryExecution",
+                "athena:CancelQueryExecution",
+                "athena:StopQueryExecution",
+                "athena:GetQueryExecution"
+              ],
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:aws:athena:${region}:${account}:workgroup/${workgroup}",
+                    {
+                      "region": {
+                        "Ref": "AWS::Region"
+                      },
+                      "account": {
+                        "Ref": "AWS::AccountId"
+                      },
+                      "workgroup": {
+                        "Ref": "analyticschimeMeetingEventsProcessingAnalyticsWorkGroupName"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Sid": "",
+              "Effect": "Allow",
+              "Action": [
+                "athena:GetDataCatalog"
+              ],
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:aws:athena:${region}:${account}:datacatalog/*",
+                    {
+                      "region": {
+                        "Ref": "AWS::Region"
+                      },
+                      "account": {
+                        "Ref": "AWS::AccountId"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Sid": "",
+              "Effect": "Allow",
+              "Action": [
+                "glue:GetTable",
+                "glue:GetTables",
+                "glue:GetDatabase",
+                "glue:GetDatabases",
+                "glue:GetPartition",
+                "glue:GetPartitions"
+              ],
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:aws:glue:${region}:${account}:catalog",
+                    {
+                      "region": {
+                        "Ref": "AWS::Region"
+                      },
+                      "account": {
+                        "Ref": "AWS::AccountId"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "arn:aws:glue:${region}:${account}:database/${database}",
+                    {
+                      "region": {
+                        "Ref": "AWS::Region"
+                      },
+                      "account": {
+                        "Ref": "AWS::AccountId"
+                      },
+                      "database": {
+                        "Ref": "analyticschimeMeetingEventsProcessingAnalyticsDatabaseName"
+                      }
+                    }
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "arn:aws:glue:${region}:${account}:table/${database}/*",
+                    {
+                      "region": {
+                        "Ref": "AWS::Region"
+                      },
+                      "account": {
+                        "Ref": "AWS::AccountId"
+                      },
+                      "database": {
+                        "Ref": "analyticschimeMeetingEventsProcessingAnalyticsDatabaseName"
+                      }
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "Sid": "",
+              "Effect": "Allow",
+              "Action": [
+                "sqs:SendMessage"
+              ],
+              "Resource": [
+                {
+                  "Ref": "functionchimeMetricsResultProcessorSqsAthenaJobsQueueArn"
+                }
+              ]
+            },
+            {
+              "Sid": "",
+              "Effect": "Allow",
+              "Action": [
+                "sqs:ReceiveMessage",
+                "sqs:DeleteMessage",
+                "sqs:DeleteMessageBatch",
+                "sqs:GetQueueAttributes",
+                "sqs:ChangeMessageVisibility"
+              ],
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "SqsChimeEventBridgeTrigger",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::GetAtt": [
+                    "SqsChimeEventBridgeTriggerDeadletter",
+                    "Arn"
+                  ]
+                }
+              ]
+            },
+            {
+              "Sid": "",
+              "Effect": "Allow",
+              "Action": [
+                "s3:GetBucketLocation",
+                "s3:GetObject",
+                "s3:ListBucket",
+                "s3:ListBucketMultipartUploads",
+                "s3:ListMultipartUploadParts",
+                "s3:AbortMultipartUpload",
+                "s3:PutObject"
+              ],
+              "Resource": [
+                {
+                  "Ref": "analyticschimeMeetingEventsProcessingAnalyticsBucketArn"
+                },
+                {
+                  "Fn::Join": [
+                    "/",
+                    [
+                      {
+                        "Ref": "analyticschimeMeetingEventsProcessingAnalyticsBucketArn"
+                      },
+                      "*"
+                    ]
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "LambdaFunctionSchedule": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "ScheduleExpression": "rate(1 minute)",
+        "State": "DISABLED",
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": [
+                "LambdaFunction",
+                "Arn"
+              ]
+            },
+            "Id": "1"
+          }
+        ]
+      }
+    },
+    "LambdaFunctionCwPermission": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "Action": "lambda:InvokeFunction",
+        "FunctionName": {
+          "Fn::GetAtt": [
+            "LambdaFunction",
+            "Arn"
+          ]
+        },
+        "Principal": "events.amazonaws.com",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "LambdaFunctionSchedule",
+            "Arn"
+          ]
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "Name": {
+      "Value": {
+        "Ref": "LambdaFunction"
+      }
+    },
+    "Arn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "LambdaFunction",
+          "Arn"
+        ]
+      }
+    },
+    "Region": {
+      "Value": {
+        "Ref": "AWS::Region"
+      }
+    },
+    "LambdaExecutionRole": {
+      "Value": {
+        "Ref": "LambdaExecutionRole"
+      }
+    },
+    "SqsChimeEventBridgeTriggerArn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "SqsChimeEventBridgeTrigger",
+          "Arn"
+        ]
+      }
+    }
+  }
+}

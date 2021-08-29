@@ -1,0 +1,356 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Chime LTI > API function to respond to auth requests from LTI provider",
+  "Parameters": {
+    "CloudWatchRule": {
+      "Type": "String",
+      "Default": "NONE",
+      "Description": " Schedule Expression"
+    },
+    "deploymentBucketName": {
+      "Type": "String"
+    },
+    "env": {
+      "Type": "String"
+    },
+    "s3Key": {
+      "Type": "String"
+    },
+    "storagedynamoPlatformsArn": {
+      "Type": "String"
+    },
+    "storagedynamoPlatformsName": {
+      "Type": "String"
+    },
+    "LtiProviderPlatformIds": {
+      "Type": "String",
+      "Default": "*"
+    },
+    "LtiProviderClientIds": {
+      "Type": "String",
+      "Default": "*"
+    },
+    "SSMParameterChimeFrontendUri": {
+      "Type": "String",
+      "Default": "/chime/web/frontendUrl"
+    },
+    "SSMParameterChimeBackendUri": {
+      "Type": "String",
+      "Default": "/chime/web/backendUrl"
+    }
+  },
+  "Conditions": {
+    "ShouldNotCreateEnvResources": {
+      "Fn::Equals": [
+        {
+          "Ref": "env"
+        },
+        "NONE"
+      ]
+    }
+  },
+  "Resources": {
+    "LambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Metadata": {
+        "aws:asset:path": "./src",
+        "aws:asset:property": "Code"
+      },
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "deploymentBucketName"
+          },
+          "S3Key": {
+            "Ref": "s3Key"
+          }
+        },
+        "Handler": "index.handler",
+        "FunctionName": {
+          "Fn::If": [
+            "ShouldNotCreateEnvResources",
+            "chimeLtiApiLogin",
+            {
+              "Fn::Join": [
+                "",
+                [
+                  "chimeLtiApiLogin",
+                  "-",
+                  {
+                    "Ref": "env"
+                  }
+                ]
+              ]
+            }
+          ]
+        },
+        "Environment": {
+          "Variables": {
+            "ENV": {
+              "Ref": "env"
+            },
+            "REGION": {
+              "Ref": "AWS::Region"
+            },
+            "PLATFORM_TABLE": {
+              "Ref": "storagedynamoPlatformsName"
+            },
+            "SSM_PARAM_LTI_TOKEN_URI": {
+              "Ref": "SSMParameterTokenUri"
+            },
+            "SSM_PARAM_LTI_AUTH_REQUEST_URI": {
+              "Ref": "SSMParameterAuthRequestUri"
+            },
+            "SSM_PARAM_LTI_JWK_URI": {
+              "Ref": "SSMParameterJwkUri"
+            },
+            "SSM_PARAM_LTI_TOKEN_EXPIRATION_TIME": {
+              "Ref": "SSMParameterTokenExpirationTime"
+            },
+            "SSM_PARAM_CHIME_FRONTEND_URI": {
+              "Ref": "SSMParameterChimeFrontendUri"
+            },
+            "SSM_PARAM_CHIME_BACKEND_URI": {
+              "Ref": "SSMParameterChimeBackendUri"
+            },
+            "LTI_PROVIDER_PLATFORM_IDS": {
+              "Ref": "LtiProviderPlatformIds"
+            },
+            "LTI_PROVIDER_CLIENT_IDS": {
+              "Ref": "LtiProviderClientIds"
+            }
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "LambdaExecutionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Layers": [],
+        "Timeout": "25"
+      }
+    },
+    "LambdaExecutionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": {
+          "Fn::If": [
+            "ShouldNotCreateEnvResources",
+            "chimeLambdaRolec2028f89",
+            {
+              "Fn::Join": [
+                "",
+                [
+                  "chimeLambdaRolec2028f89",
+                  "-",
+                  {
+                    "Ref": "env"
+                  }
+                ]
+              ]
+            }
+          ]
+        },
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "lambdaexecutionpolicy": {
+      "DependsOn": [
+        "LambdaExecutionRole"
+      ],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "lambda-execution-policy",
+        "Roles": [
+          {
+            "Ref": "LambdaExecutionRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+              ],
+              "Resource": {
+                "Fn::Sub": [
+                  "arn:aws:logs:${region}:${account}:log-group:/aws/lambda/${lambda}:log-stream:*",
+                  {
+                    "region": {
+                      "Ref": "AWS::Region"
+                    },
+                    "account": {
+                      "Ref": "AWS::AccountId"
+                    },
+                    "lambda": {
+                      "Ref": "LambdaFunction"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:GetItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:PutItem"
+              ],
+              "Resource": {
+                "Ref": "storagedynamoPlatformsArn"
+              }
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "ssm:GetParameters"
+              ],
+              "Resource": {
+                "Fn::Sub": [
+                  "arn:aws:ssm:${region}:${account}:parameter/chime*",
+                  {
+                    "region": {
+                      "Ref": "AWS::Region"
+                    },
+                    "account": {
+                      "Ref": "AWS::AccountId"
+                    },
+                    "lambda": {
+                      "Ref": "LambdaFunction"
+                    }
+                  }
+                ]
+              }
+            }
+          ]
+        }
+      }
+    },
+    "SSMParameterTokenExpirationTime": {
+      "Type": "AWS::SSM::Parameter",
+      "Properties": {
+        "Description": "Default Url assumed as the token URI of an LTI platform.",
+        "Name": {
+          "Fn::Join": [
+            "",
+            [
+              "/chime/lti/",
+              {
+                "Ref": "env"
+              },
+              "/ltiToolTokenExpiration"
+            ]
+          ]
+        },
+        "Type": "String",
+        "Value": "4h"
+      }
+    },
+    "SSMParameterTokenUri": {
+      "Type": "AWS::SSM::Parameter",
+      "Properties": {
+        "Description": "Default Url assumed as the token URI of an LTI platform.",
+        "Name": {
+          "Fn::Join": [
+            "",
+            [
+              "/chime/lti/",
+              {
+                "Ref": "env"
+              },
+              "/ltiPlatformTokenUri"
+            ]
+          ]
+        },
+        "Type": "String",
+        "Value": "https://"
+      }
+    },
+    "SSMParameterAuthRequestUri": {
+      "Type": "AWS::SSM::Parameter",
+      "Properties": {
+        "Description": "Default Url assumed as the authentication request URI of an LTI platform.",
+        "Name": {
+          "Fn::Join": [
+            "",
+            [
+              "/chime/lti/",
+              {
+                "Ref": "env"
+              },
+              "/ltiPlatformAuthRequestUri"
+            ]
+          ]
+        },
+        "Type": "String",
+        "Value": "https://"
+      }
+    },
+    "SSMParameterJwkUri": {
+      "Type": "AWS::SSM::Parameter",
+      "Properties": {
+        "Description": "Default Url assumed as the public keyset URI of an LTI platform.",
+        "Name": {
+          "Fn::Join": [
+            "",
+            [
+              "/chime/lti/",
+              {
+                "Ref": "env"
+              },
+              "/ltiPlatformJwkUri"
+            ]
+          ]
+        },
+        "Type": "String",
+        "Value": "https://"
+      }
+    }
+  },
+  "Outputs": {
+    "Name": {
+      "Value": {
+        "Ref": "LambdaFunction"
+      }
+    },
+    "Arn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "LambdaFunction",
+          "Arn"
+        ]
+      }
+    },
+    "Region": {
+      "Value": {
+        "Ref": "AWS::Region"
+      }
+    },
+    "LambdaExecutionRole": {
+      "Value": {
+        "Ref": "LambdaExecutionRole"
+      }
+    }
+  }
+}

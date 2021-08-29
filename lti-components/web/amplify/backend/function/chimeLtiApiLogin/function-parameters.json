@@ -1,0 +1,9 @@
+{
+  "storagedynamoPlatformsArn": {
+    "Fn::GetAtt": ["storagedynamoPlatforms", "Outputs.Arn"]
+  },
+  "storagedynamoPlatformsName": {
+    "Fn::GetAtt": ["storagedynamoPlatforms", "Outputs.Name"]
+  },
+  "lambdaLayers": []
+}

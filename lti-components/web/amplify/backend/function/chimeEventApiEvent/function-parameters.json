@@ -1,0 +1,9 @@
+{
+  "lambdaLayers": [],
+  "storagedynamoEventsMetricsArn": {
+    "Fn::GetAtt": ["storagedynamoEventsMetrics", "Outputs.Arn"]
+  },
+  "storagedynamoEventsMetricsName": {
+    "Fn::GetAtt": ["storagedynamoEventsMetrics", "Outputs.Name"]
+  }
+}

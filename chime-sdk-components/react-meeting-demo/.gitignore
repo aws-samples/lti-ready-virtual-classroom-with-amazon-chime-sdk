@@ -1,0 +1,13 @@
+.*sw*
+*~
+node_modules
+.DS_Store
+lib
+build
+coverage
+tst/snapshots/**/__diff_output__
+verdaccio_app
+.out
+demo/*/yalc.lock
+demo/*/.yalc
+demo/chat/src/Config.js

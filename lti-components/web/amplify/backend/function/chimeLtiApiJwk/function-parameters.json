@@ -1,0 +1,9 @@
+{
+  "lambdaLayers": [],
+  "securitytokenSecretArn": {
+    "Fn::GetAtt": ["securitytokenSecret", "Outputs.Arn"]
+  },
+  "securitytokenSecretName": {
+    "Fn::GetAtt": ["securitytokenSecret", "Outputs.Name"]
+  }
+}

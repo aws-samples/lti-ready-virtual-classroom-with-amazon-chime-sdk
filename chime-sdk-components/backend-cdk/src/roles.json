@@ -1,0 +1,35 @@
+[
+    {   "RoleId": "Host",
+        "Permissions": {
+            "CanUnmute": true,
+            "CanVideo": true,
+            "CanShare": true,
+            "CanEnd": true,
+            "CanKick": true,
+            "CanPromote": true,
+            "CanDemote": true
+        }
+    },
+    {   "RoleId": "Moderator",
+        "Permissions": {
+            "CanUnmute": true,
+            "CanVideo": true,
+            "CanShare": true,
+            "CanEnd": true,
+            "CanKick": true,
+            "CanPromote": true,
+            "CanDemote": true
+        }
+    },
+    {   "RoleId": "User",
+        "Permissions": {
+            "CanUnmute": false,
+            "CanVideo": false,
+            "CanShare": false,
+            "CanEnd": false,
+            "CanKick": false,
+            "CanPromote": false,
+            "CanDemote": false
+        }
+    }
+]

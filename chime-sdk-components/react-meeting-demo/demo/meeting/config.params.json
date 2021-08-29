@@ -1,0 +1,11 @@
+{
+    "hierarchy" : "/chime/web/",
+    "parameters" : [
+        {
+            "name" : "backendUrl",
+            "cliFormat" : "chime-backendapi-url",
+            "description" : "Amazon Chime Backend API URL that solution will use. For example: https://682hdz4xqh.execute-api.us-east-1.amazonaws.com/prod/",
+            "required" : true
+        }
+    ]
+}

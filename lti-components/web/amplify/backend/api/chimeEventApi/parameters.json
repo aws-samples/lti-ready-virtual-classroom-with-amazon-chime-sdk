@@ -1,0 +1,8 @@
+{
+  "functionchimeEventApiAuthorizerArn": {
+    "Fn::GetAtt": ["functionchimeEventApiAuthorizer", "Outputs.Arn"]
+  },
+  "functionchimeEventApiAuthorizerName": {
+    "Fn::GetAtt": ["functionchimeEventApiAuthorizer", "Outputs.Name"]
+  }
+}

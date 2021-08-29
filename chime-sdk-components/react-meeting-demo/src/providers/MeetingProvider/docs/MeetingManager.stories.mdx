@@ -1,0 +1,142 @@
+<Meta title="SDK Providers/MeetingManager" />
+
+# MeetingManager
+
+The `MeetingManager` is a class that helps integration with the SDK. It is tied to the `MeetingProvider` and is primarily responsible for joining, starting, and leaving your meeting.
+
+You can pass in the same `MeetingManager` instance to multiple different `MeetingProvider`s through props. This will override new `MeetingManager` instance creation inside
+the `MeetingProvider`. This is to support very specific cases where you may have different React trees within you applications. For example, you are migrating
+from an Angular application to a React application.
+
+
+You can access the `MeetingManager` instance with the `useMeetingManager` hook.
+
+## Usage
+
+`MeetingProvider` must be rendered somewhere higher in the tree.
+
+```jsx
+import React from 'react';
+import { MeetingProvider, useMeetingManager } from 'amazon-chime-sdk-component-library-react';
+
+const App = () => (
+  <MeetingProvider>
+    <MyApp />
+  </MeetingProvider>
+);
+
+const MyApp = () => {
+  const meetingManager = useMeetingManager();
+
+  ...
+}
+```
+
+## Constructor
+
+Accepts a config object of `logLevel`, `postLogConfig`, and `simulcastEnabled` that will be used when initializing a meeting session. See [MeetingProvider](/?path=/docs/sdk-providers-meetingprovider--page) documentation for more details.
+
+## Interface
+
+### `meetingManager.join`
+
+Creates a meeting session using the meeting and attendee data passed. It will attempt to select default devices for the user.
+
+```javascript
+(data: MeetingJoinData) => Promise<void>
+
+interface MeetingJoinData {
+  // The response of calling chime:CreateMeeting from your server
+  meetingInfo: any;
+
+  // The response of calling chime:CreateAttendee from your server
+  attendeeInfo: any;
+}
+```
+
+### `meetingManager.start`
+
+Starts the meeting session so that attendees can receive audio and video from the meeting. This must be called after calling `join`.
+
+```javascript
+() => Promise<void>
+```
+
+### `meetingManager.leave`
+
+Stops the meeting session and performs cleanup. This should be called anytime a user needs to leave a meeting.
+
+```javascript
+() => Promise<void>
+```
+
+### `meetingManager.getAttendee`
+
+This method is expected to be supplied by the developer. You may call this function with the Chime user ID and external user ID anytime an attendee joins the meeting, and expect to be resolved with an object that has a `name` property that will be used for video nameplates and roster state. We also add support for optional keys, so you can also pass any other data except `name`.
+
+For example - you may want to fetch the attendee from the database, or get the name from some local application state. This is up to the developer.
+
+```javascript
+(
+  chimeAttendeeId: string,
+  externalUserId?: string
+) => Promise<AttendeeResponse>
+
+interface AttendeeResponse {
+  name?: string;
+  [attribute: string]: any;
+}
+```
+
+#### Example
+
+1. `MeetingManager` instance is created internally in the `MeetingProvider` and can be retrived using `useMeetingManager` hook.
+```jsx
+import { MeetingProvider, useMeetingManager } from 'amazon-chime-sdk-component-library-react';
+
+const Root = () => (
+  <MeetingProvider>
+    <MyApp />
+  <MeetingProvider/>
+);
+
+const MyApp = () => {
+  const meetingManager = useMeetingManager();
+
+  useEffect(() => {
+    meetingManager.getAttendee = async (chimeAttendeeId: string, externalUserId?: string) => {
+      const response = await fetch('/my-attendees-endpoint);
+      const user = await response.json();
+
+      return {
+        name: user.name
+      }
+    }
+  }, [])
+}
+```
+
+2. Share the same `MeetingManager` instance with multiple different `MeetingProvider`s.
+
+You can create a new `MeetingManager` instance and then pass it as a prop to your `MeetingProvider`s. If not passed,
+a new `MeetingManager` instance will be created internally with each `MeetingProvider` when rendered; and, 
+you will get the `MeetingManager` instance associated with that particular `MeetingProvider` when `useMeetingManager` hook is called.
+
+```jsx
+import { MeetingProvider, useMeetingManager } from 'amazon-chime-sdk-component-library-react';
+
+const Root = () => {
+  const meetingManager = new MeetingManager({ logLevel: LogLevel.INFO });
+  
+  return (
+    <MeetingProvider meetingManager={meetingManager}>
+      <MyApp1 />
+    <MeetingProvider/>
+
+    <MeetingProvider meetingManager={meetingManager}>
+      <MyApp2 />
+    <MeetingProvider/>
+  ); 
+}
+```
+

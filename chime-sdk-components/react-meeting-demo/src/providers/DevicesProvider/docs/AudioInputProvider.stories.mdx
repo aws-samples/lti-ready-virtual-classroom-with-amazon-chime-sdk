@@ -1,0 +1,69 @@
+<Meta title="SDK Providers/AudioInputProvider" />
+
+# AudioInputProvider
+
+The `AudioInputProvider` provides a list of the user's available `audio-input` devices, the currently selected device, and the error if device selection fails.
+
+## State
+
+```javascript
+{
+  devices: [{
+    deviceId: string;
+    label: string;
+  }],
+
+  // The device ID of the currently selected device
+  selectedDevice: string | null
+
+  // The error if device selection fails
+  selectDeviceError?: Error | null
+}
+
+```
+
+You can access the state by using the [useAudioInputs](/?path=/docs/sdk-hooks-useaudioinputs--page) hook.
+
+## Importing
+
+```javascript
+import { AudioInputProvider } from 'amazon-chime-sdk-component-library-react';
+```
+
+## Usage
+
+If you are using `MeetingProvider`, `AudioInputProvider` is rendered by default.
+
+```jsx
+import React from 'react';
+import {
+  MeetingProvider,
+  useAudioInputs
+} from 'amazon-chime-sdk-component-library-react';
+
+const App = () => (
+  <MeetingProvider>
+    <MyChild />
+  </MeetingProvider>
+);
+
+const MyChild = () => {
+  const { devices, selectedDevice, selectDeviceError } = useAudioInputs();
+  const items = devices.map(device => (
+    <li key={device.deviceId}>{device.label}</li>
+  ));
+
+  return (
+    <div>
+      <p>Current Selected DeviceId: {selectedDevice}</p>
+      <p>Devices</p>
+      <ul>{items}</ul>
+      {selectDeviceError && (<p>{selectDeviceError.message}<p/>)}
+    </div>
+  );
+};
+```
+
+### Dependencies
+
+- `MeetingProvider`

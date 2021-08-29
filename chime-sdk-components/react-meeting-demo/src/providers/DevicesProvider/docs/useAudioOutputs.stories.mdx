@@ -1,0 +1,60 @@
+import { Props } from '@storybook/addon-docs/blocks';
+import { useAudioOutputs } from '../';
+
+<Meta title="SDK Hooks/useAudioOutputs" />
+
+# useAudioOutputs
+
+The `useAudioOutputs` hook returns a list of the user's available `audio-output` devices and the currently selected device.
+
+## Return Value
+
+```javascript
+{
+  devices: [{
+    deviceId: string;
+    label: string;
+  }],
+
+  // The device ID of the currently selected device
+  selectedDevice: string | null
+}
+
+```
+
+## Importing
+
+```javascript
+import { useAudioOutputs } from 'amazon-chime-sdk-component-library-react';
+```
+
+## Usage
+
+The hook depends on the `DevicesProvider`. If you are using `MeetingProvider`, it is rendered by default.
+
+```jsx
+import React from 'react';
+import {
+  MeetingProvider,
+  useAudioOutputs
+} from 'amazon-chime-sdk-component-library-react';
+
+const App = () => (
+  <MeetingProvider>
+    <MyChild />
+  </MeetingProvider>
+);
+
+const MyChild = () => {
+  const { devices } = useAudioOutputs();
+  const items = devices.map(device => (
+    <li key={device.deviceId}>{device.label}</li>
+  ));
+
+  return <ul>{items}</ul>;
+};
+```
+
+### Dependencies
+
+- `DevicesProvider`

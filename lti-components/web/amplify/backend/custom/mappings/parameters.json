@@ -1,0 +1,14 @@
+{
+    "functionchimeMetricsResultProcessorSqsAthenaJobsQueueArn": {
+        "Fn::GetAtt": ["functionchimeMetricsResultProcessor", "Outputs.SqsAthenaJobsQueueArn"]
+    },
+    "functionchimeMetricsResultProcessorArn": {
+        "Fn::GetAtt": ["functionchimeMetricsResultProcessor", "Outputs.Arn"]
+    },
+    "functionchimeMetricsQueryTriggerSqsChimeEventBridgeTriggerArn": {
+        "Fn::GetAtt": ["functionchimeMetricsQueryTrigger", "Outputs.SqsChimeEventBridgeTriggerArn"]
+    },
+    "functionchimeMetricsQueryTriggerArn": {
+        "Fn::GetAtt": ["functionchimeMetricsQueryTrigger", "Outputs.Arn"]
+    }
+}

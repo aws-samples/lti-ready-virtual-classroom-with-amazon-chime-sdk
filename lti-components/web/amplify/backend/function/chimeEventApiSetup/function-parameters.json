@@ -1,0 +1,21 @@
+{
+  "lambdaLayers": [],
+  "analyticschimeMeetingEventsProcessingAnalyticsBucketEventsFolderName": {
+    "Fn::GetAtt": [
+      "analyticschimeMeetingEventsProcessing",
+      "Outputs.AnalyticsBucketEventsFolderName"
+    ]
+  },
+  "analyticschimeMeetingEventsProcessingAnalyticsBucketName": {
+    "Fn::GetAtt": [
+      "analyticschimeMeetingEventsProcessing",
+      "Outputs.AnalyticsBucketName"
+    ]
+  },
+  "analyticschimeMeetingEventsProcessingAnalyticsBucketArn": {
+    "Fn::GetAtt": [
+      "analyticschimeMeetingEventsProcessing",
+      "Outputs.AnalyticsBucketArn"
+    ]
+  }
+}

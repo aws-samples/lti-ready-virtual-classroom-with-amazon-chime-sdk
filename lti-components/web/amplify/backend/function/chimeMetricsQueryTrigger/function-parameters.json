@@ -1,0 +1,45 @@
+{
+  "lambdaLayers": [],
+  "analyticschimeMeetingEventsProcessingAnalyticsBucketArn": {
+    "Fn::GetAtt": [
+      "analyticschimeMeetingEventsProcessing",
+      "Outputs.AnalyticsBucketArn"
+    ]
+  },
+  "analyticschimeMeetingEventsProcessingNamedQueryIdPairMeetingEvents": {
+    "Fn::GetAtt": [
+      "analyticschimeMeetingEventsProcessing",
+      "Outputs.NamedQueryIdPairMeetingEvents"
+    ]
+  },
+  "analyticschimeMeetingEventsProcessingNamedQueryIdAggregateMeetingEvents": {
+    "Fn::GetAtt": [
+      "analyticschimeMeetingEventsProcessing",
+      "Outputs.NamedQueryIdAggregateMeetingEvents"
+    ]
+  },
+  "analyticschimeMeetingEventsProcessingAnalyticsResultOutputLocation": {
+    "Fn::GetAtt": [
+      "analyticschimeMeetingEventsProcessing",
+      "Outputs.AnalyticsResultOutputLocation"
+    ]
+  },
+  "analyticschimeMeetingEventsProcessingAnalyticsDatabaseName": {
+    "Fn::GetAtt": [
+      "analyticschimeMeetingEventsProcessing",
+      "Outputs.AnalyticsDatabaseName"
+    ]
+  },
+  "analyticschimeMeetingEventsProcessingAnalyticsWorkGroupName": {
+    "Fn::GetAtt": [
+      "analyticschimeMeetingEventsProcessing",
+      "Outputs.AnalyticsWorkGroupName"
+    ]
+  },
+  "functionchimeMetricsResultProcessorSqsAthenaJobsQueueArn": {
+    "Fn::GetAtt": ["functionchimeMetricsResultProcessor", "Outputs.SqsAthenaJobsQueueArn"]
+  },
+  "functionchimeMetricsResultProcessorSqsAthenaJobsQueueUrl": {
+    "Fn::GetAtt": ["functionchimeMetricsResultProcessor", "Outputs.SqsAthenaJobsQueueUrl"]
+  }
+}

@@ -1,0 +1,35 @@
+import { Preview, Props } from '@storybook/addon-docs/blocks';
+import { ThemeProvider } from 'styled-components';
+
+import Radio from './';
+import { lightTheme } from '../../../theme/';
+import { GlobalStyles } from '../../../theme/GlobalStyles';
+
+# Radio
+
+You can use the Radio component to select one of many given choices.
+
+You may put Radio components in a RadioGroup to represent a set of related options, from which you can select only one option.
+
+## Importing
+
+```javascript
+import { Radio } from 'amazon-chime-sdk-component-library-react';
+```
+
+## Example
+
+<ThemeProvider theme={lightTheme}>
+  <GlobalStyles/>
+  <Preview>
+    <Radio value="apple" label="Radio Input" checked onChange={e => {}} />
+  </Preview>
+</ThemeProvider>
+
+```jsx
+<Radio value="apple" label="Radio Input" checked onChange={e => {}} />
+```
+
+## Props
+
+<Props of={Radio} />

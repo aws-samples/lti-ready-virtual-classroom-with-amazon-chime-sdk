@@ -1,0 +1,18 @@
+{
+  "lambdaLayers": [],
+  "storagedynamoEventsMetricsArn": {
+    "Fn::GetAtt": ["storagedynamoEventsMetrics", "Outputs.Arn"]
+  },
+  "storagedynamoEventsMetricsName": {
+    "Fn::GetAtt": ["storagedynamoEventsMetrics", "Outputs.Name"]
+  },
+  "analyticschimeMeetingEventsProcessingAnalyticsResultOutputLocationArn": {
+    "Fn::GetAtt": ["analyticschimeMeetingEventsProcessing", "Outputs.AnalyticsResultOutputLocationArn"]
+  },
+  "analyticschimeMeetingEventsProcessingAnalyticsWorkGroupName": {
+    "Fn::GetAtt": [
+      "analyticschimeMeetingEventsProcessing",
+      "Outputs.AnalyticsWorkGroupName"
+    ]
+  }
+}

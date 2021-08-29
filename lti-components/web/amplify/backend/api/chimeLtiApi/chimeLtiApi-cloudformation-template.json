@@ -1,0 +1,646 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Chime LTI > API for interacting with an LTI provider like an LMS.",
+
+  "Parameters": {
+    "env": {
+      "Type": "String"
+    },
+
+    "functionchimeLtiApiAuthName": {
+      "Type": "String",
+      "Default": "functionchimeLtiApiAuthName"
+    },
+
+    "functionchimeLtiApiAuthArn": {
+      "Type": "String",
+      "Default": "functionchimeLtiApiAuthArn"
+    },
+
+    "functionchimeLtiApiLoginName": {
+      "Type": "String",
+      "Default": "functionchimeLtiApiLoginName"
+    },
+
+    "functionchimeLtiApiLoginArn": {
+      "Type": "String",
+      "Default": "functionchimeLtiApiLoginArn"
+    },
+
+    "functionchimeLtiApiJwkName": {
+      "Type": "String",
+      "Default": "functionchimeLtiApiJwkName"
+    },
+
+    "functionchimeLtiApiJwkArn": {
+      "Type": "String",
+      "Default": "functionchimeLtiApiJwkArn"
+    }
+  },
+  "Conditions": {
+    "ShouldNotCreateEnvResources": {
+      "Fn::Equals": [
+        {
+          "Ref": "env"
+        },
+        "NONE"
+      ]
+    }
+  },
+  "Resources": {
+    "chimeLtiApi": {
+      "Type": "AWS::ApiGateway::RestApi",
+      "Properties": {
+        "Description": "",
+        "Name": "chimeLtiApi",
+        "Body": {
+          "swagger": "2.0",
+          "info": {
+            "version": "2018-05-24T17:52:00Z",
+            "title": "chimeLtiApi"
+          },
+          "host": {
+            "Fn::Join": [
+              "",
+              [
+                "apigateway.",
+                {
+                  "Ref": "AWS::Region"
+                },
+                ".amazonaws.com"
+              ]
+            ]
+          },
+          "basePath": {
+            "Fn::If": [
+              "ShouldNotCreateEnvResources",
+              "/Prod",
+              {
+                "Fn::Join": [
+                  "",
+                  [
+                    "/",
+                    {
+                      "Ref": "env"
+                    }
+                  ]
+                ]
+              }
+            ]
+          },
+          "schemes": ["https"],
+          "paths": {
+            "/auth": {
+              "options": {
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "responses": {
+                  "200": {
+                    "description": "200 response",
+                    "headers": {
+                      "Access-Control-Allow-Origin": {
+                        "type": "string"
+                      },
+                      "Access-Control-Allow-Methods": {
+                        "type": "string"
+                      },
+                      "Access-Control-Allow-Headers": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "x-amazon-apigateway-integration": {
+                  "responses": {
+                    "default": {
+                      "statusCode": "200",
+                      "responseParameters": {
+                        "method.response.header.Access-Control-Allow-Methods": "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
+                        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                        "method.response.header.Access-Control-Allow-Origin": "'*'"
+                      }
+                    }
+                  },
+                  "requestTemplates": {
+                    "application/json": "{\"statusCode\": 200}"
+                  },
+                  "passthroughBehavior": "when_no_match",
+                  "type": "mock"
+                }
+              },
+              "x-amazon-apigateway-any-method": {
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "parameters": [
+                  {
+                    "in": "body",
+                    "name": "RequestSchema",
+                    "required": false,
+                    "schema": {
+                      "$ref": "#/definitions/RequestSchema"
+                    }
+                  }
+                ],
+                "responses": {
+                  "200": {
+                    "description": "200 response",
+                    "schema": {
+                      "$ref": "#/definitions/ResponseSchema"
+                    }
+                  }
+                },
+
+                "x-amazon-apigateway-integration": {
+                  "responses": {
+                    "default": {
+                      "statusCode": "200"
+                    }
+                  },
+                  "uri": {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "arn:aws:apigateway:",
+                        {
+                          "Ref": "AWS::Region"
+                        },
+                        ":lambda:path/2015-03-31/functions/",
+
+                        {
+                          "Ref": "functionchimeLtiApiAuthArn"
+                        },
+
+                        "/invocations"
+                      ]
+                    ]
+                  },
+                  "passthroughBehavior": "when_no_match",
+                  "httpMethod": "POST",
+                  "type": "aws_proxy"
+                }
+              }
+            },
+
+            "/login": {
+              "options": {
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "responses": {
+                  "200": {
+                    "description": "200 response",
+                    "headers": {
+                      "Access-Control-Allow-Origin": {
+                        "type": "string"
+                      },
+                      "Access-Control-Allow-Methods": {
+                        "type": "string"
+                      },
+                      "Access-Control-Allow-Headers": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "x-amazon-apigateway-integration": {
+                  "responses": {
+                    "default": {
+                      "statusCode": "200",
+                      "responseParameters": {
+                        "method.response.header.Access-Control-Allow-Methods": "'DELETE,GET,HEAD,OPTIONS,PATCH,POST,PUT'",
+                        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                        "method.response.header.Access-Control-Allow-Origin": "'*'"
+                      }
+                    }
+                  },
+                  "requestTemplates": {
+                    "application/json": "{\"statusCode\": 200}"
+                  },
+                  "passthroughBehavior": "when_no_match",
+                  "type": "mock"
+                }
+              },
+              "x-amazon-apigateway-any-method": {
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "parameters": [
+                  {
+                    "in": "body",
+                    "name": "RequestSchema",
+                    "required": false,
+                    "schema": {
+                      "$ref": "#/definitions/RequestSchema"
+                    }
+                  }
+                ],
+                "responses": {
+                  "200": {
+                    "description": "200 response",
+                    "schema": {
+                      "$ref": "#/definitions/ResponseSchema"
+                    }
+                  }
+                },
+
+                "x-amazon-apigateway-integration": {
+                  "responses": {
+                    "default": {
+                      "statusCode": "200"
+                    }
+                  },
+                  "uri": {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "arn:aws:apigateway:",
+                        {
+                          "Ref": "AWS::Region"
+                        },
+                        ":lambda:path/2015-03-31/functions/",
+
+                        {
+                          "Ref": "functionchimeLtiApiLoginArn"
+                        },
+
+                        "/invocations"
+                      ]
+                    ]
+                  },
+                  "passthroughBehavior": "when_no_match",
+                  "httpMethod": "POST",
+                  "type": "aws_proxy"
+                }
+              }
+            },
+
+            "/jwk": {
+              "options": {
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "responses": {
+                  "200": {
+                    "description": "200 response",
+                    "headers": {
+                      "Access-Control-Allow-Origin": {
+                        "type": "string"
+                      },
+                      "Access-Control-Allow-Methods": {
+                        "type": "string"
+                      },
+                      "Access-Control-Allow-Headers": {
+                        "type": "string"
+                      }
+                    }
+                  }
+                },
+                "x-amazon-apigateway-integration": {
+                  "responses": {
+                    "default": {
+                      "statusCode": "200",
+                      "responseParameters": {
+                        "method.response.header.Access-Control-Allow-Methods": "'GET,HEAD,OPTIONS'",
+                        "method.response.header.Access-Control-Allow-Headers": "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token,X-Amz-User-Agent'",
+                        "method.response.header.Access-Control-Allow-Origin": "'*'"
+                      }
+                    }
+                  },
+                  "requestTemplates": {
+                    "application/json": "{\"statusCode\": 200}"
+                  },
+                  "passthroughBehavior": "when_no_match",
+                  "type": "mock"
+                }
+              },
+              "get": {
+                "produces": ["application/json"],
+                "responses": {
+                  "200": {
+                    "description": "200 response",
+                    "schema": {
+                      "$ref": "#/definitions/ResponseSchema"
+                    }
+                  }
+                },
+
+                "x-amazon-apigateway-integration": {
+                  "responses": {
+                    "default": {
+                      "statusCode": "200"
+                    }
+                  },
+                  "uri": {
+                    "Fn::Join": [
+                      "",
+                      [
+                        "arn:aws:apigateway:",
+                        {
+                          "Ref": "AWS::Region"
+                        },
+                        ":lambda:path/2015-03-31/functions/",
+
+                        {
+                          "Ref": "functionchimeLtiApiJwkArn"
+                        },
+
+                        "/invocations"
+                      ]
+                    ]
+                  },
+                  "passthroughBehavior": "when_no_match",
+                  "httpMethod": "POST",
+                  "type": "aws_proxy"
+                }
+              }
+            }
+          },
+          "securityDefinitions": {
+            "sigv4": {
+              "type": "apiKey",
+              "name": "Authorization",
+              "in": "header",
+              "x-amazon-apigateway-authtype": "awsSigv4"
+            }
+          },
+          "definitions": {
+            "RequestSchema": {
+              "type": "object",
+              "required": ["request"],
+              "properties": {
+                "request": {
+                  "type": "string"
+                }
+              },
+              "title": "Request Schema"
+            },
+            "ResponseSchema": {
+              "type": "object",
+              "required": ["response"],
+              "properties": {
+                "response": {
+                  "type": "string"
+                }
+              },
+              "title": "Response Schema"
+            }
+          }
+        },
+        "FailOnWarnings": true
+      }
+    },
+
+    "functionchimeLtiApiAuthPermissionchimeLtiApi": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "functionchimeLtiApiAuthName"
+        },
+
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:aws:execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "chimeLtiApi"
+              },
+              "/*/*/auth"
+            ]
+          ]
+        }
+      }
+    },
+
+    "functionchimeLtiApiLoginPermissionchimeLtiApi": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "functionchimeLtiApiLoginName"
+        },
+
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:aws:execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "chimeLtiApi"
+              },
+              "/*/*/login"
+            ]
+          ]
+        }
+      }
+    },
+
+    "functionchimeLtiApiJwkPermissionchimeLtiApi": {
+      "Type": "AWS::Lambda::Permission",
+      "Description": "update",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "functionchimeLtiApiJwkName"
+        },
+
+        "Action": "lambda:InvokeFunction",
+        "Principal": "apigateway.amazonaws.com",
+        "SourceArn": {
+          "Fn::Join": [
+            "",
+            [
+              "arn:aws:execute-api:",
+              {
+                "Ref": "AWS::Region"
+              },
+              ":",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":",
+              {
+                "Ref": "chimeLtiApi"
+              },
+              "/*/*/jwk"
+            ]
+          ]
+        }
+      }
+    },
+
+    "DeploymentAPIGWchimeLtiApi": {
+      "Type": "AWS::ApiGateway::Deployment",
+      "Properties": {
+        "Description": "The Development stage deployment of your API.",
+        "StageName": {
+          "Fn::If": [
+            "ShouldNotCreateEnvResources",
+            "Prod",
+            {
+              "Ref": "env"
+            }
+          ]
+        },
+        "RestApiId": {
+          "Ref": "chimeLtiApi"
+        }
+      }
+    },
+    "SSMParameterJwkUri": {
+      "Type": "AWS::SSM::Parameter",
+      "Properties": {
+        "Description": "URL of the public key which is used by an LTI provider to verify client message signatures.",
+        "Name": {
+          "Fn::Join": ["", ["/chime/lti/", { "Ref": "env" }, "/ltiToolJwkUri"]]
+        },
+        "Type": "String",
+        "Value": {
+          "Fn::Join": [
+            "",
+            [
+              "https://",
+              { "Ref": "chimeLtiApi" },
+              ".execute-api.",
+              { "Ref": "AWS::Region" },
+              ".amazonaws.com/",
+              {
+                "Fn::If": [
+                  "ShouldNotCreateEnvResources",
+                  "Prod",
+                  { "Ref": "env" }
+                ]
+              },
+              "/jwk"
+            ]
+          ]
+        }
+      }
+    },
+    "SSMParameterAuthUri": {
+      "Type": "AWS::SSM::Parameter",
+      "Properties": {
+        "Description": "URL of the LTI plugin tool which an LTI provider send the token to.",
+        "Name": {
+          "Fn::Join": ["", ["/chime/lti/", { "Ref": "env" }, "/ltiToolAuthUri"]]
+        },
+        "Type": "String",
+        "Value": {
+          "Fn::Join": [
+            "",
+            [
+              "https://",
+              { "Ref": "chimeLtiApi" },
+              ".execute-api.",
+              { "Ref": "AWS::Region" },
+              ".amazonaws.com/",
+              {
+                "Fn::If": [
+                  "ShouldNotCreateEnvResources",
+                  "Prod",
+                  { "Ref": "env" }
+                ]
+              },
+              "/auth"
+            ]
+          ]
+        }
+      }
+    },
+    "SSMParameterLoginUri": {
+      "Type": "AWS::SSM::Parameter",
+      "Properties": {
+        "Description": "URL for login requests being sent out by an LTI provider.",
+        "Name": {
+          "Fn::Join": ["", ["/chime/lti/", { "Ref": "env" }, "/ltiToolLoginUri"]]
+        },
+        "Type": "String",
+        "Value": {
+          "Fn::Join": [
+            "",
+            [
+              "https://",
+              { "Ref": "chimeLtiApi" },
+              ".execute-api.",
+              { "Ref": "AWS::Region" },
+              ".amazonaws.com/",
+              {
+                "Fn::If": [
+                  "ShouldNotCreateEnvResources",
+                  "Prod",
+                  { "Ref": "env" }
+                ]
+              },
+              "/login"
+            ]
+          ]
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "RootUrl": {
+      "Description": "Root URL of the API gateway",
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            { "Ref": "chimeLtiApi" },
+            ".execute-api.",
+            { "Ref": "AWS::Region" },
+            ".amazonaws.com/",
+            {
+              "Fn::If": [
+                "ShouldNotCreateEnvResources",
+                "Prod",
+                { "Ref": "env" }
+              ]
+            }
+          ]
+        ]
+      }
+    },
+    "LtiToolPublicKeyUrl": {
+      "Description": "URL of the public key which is used by an LTI provider to verify client message signatures.",
+      "Value": {
+        "Fn::GetAtt": ["SSMParameterJwkUri", "Value"]
+      }
+    },
+    "LtiToolAuthUrl": {
+      "Description": "URL of the LTI plugin tool which an LTI provider uses to send the token to.",
+      "Value": {
+        "Fn::GetAtt": ["SSMParameterAuthUri", "Value"]
+      }
+    },
+    "LtiToolLoginUrl": {
+      "Description": "URL for login requests being sent out by an LTI provider.",
+      "Value": {
+        "Fn::GetAtt": ["SSMParameterLoginUri", "Value"]
+      }
+    },
+    "ApiName": {
+      "Description": "API Friendly name",
+      "Value": "chimeLtiApi"
+    },
+    "ApiId": {
+      "Description": "API ID (prefix of API URL)",
+      "Value": { "Ref": "chimeLtiApi" }
+    }
+  }
+}

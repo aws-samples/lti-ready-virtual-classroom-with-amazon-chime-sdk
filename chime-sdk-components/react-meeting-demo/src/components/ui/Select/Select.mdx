@@ -1,0 +1,61 @@
+import { Preview, Props } from '@storybook/addon-docs/blocks';
+import { ThemeProvider } from 'styled-components';
+
+import Select from './';
+import { lightTheme } from '../../../theme/';
+import { GlobalStyles } from '../../../theme/GlobalStyles';
+
+# Select
+
+The Select component allows the user to select one from a drop-down list with options.
+
+## Importing
+
+```javascript
+import { Select } from 'amazon-chime-sdk-component-library-react';
+```
+
+## Example
+
+<ThemeProvider theme={lightTheme}>
+  <GlobalStyles />
+  <Preview>
+    <Flex layout="fill-space-centered">
+      <div style={{ height: 'auto', width: '15rem', margin: '2rem auto' }}>
+        <Select
+          value="no_fruit_selected"
+          options={[
+            { value: 'no_fruit_selected', label: 'Select an option' },
+            { value: 'bananas', label: 'Bananas' },
+            { value: 'oranges', label: 'Oranges' },
+            { value: 'grapefruit', label: 'Grapefruit' },
+          ]}
+          aria-label="basic select input"
+          onChange={(e) => {}}
+        />
+      </div>
+    </Flex>
+  </Preview>
+</ThemeProvider>
+
+```jsx
+<Flex layout="fill-space-centered">
+  <div style={{ height: 'auto', width: '15rem', margin: '2rem auto' }}>
+    <Select
+      value="no_fruit_selected"
+      options={[
+        { value: 'no_fruit_selected', label: 'Select an option' },
+        { value: 'bananas', label: 'Bananas' },
+        { value: 'oranges', label: 'Oranges' },
+        { value: 'grapefruit', label: 'Grapefruit' },
+      ]}
+      aria-label="basic select input"
+      onChange={(e) => {}}
+    />
+  </div>
+</Flex>
+```
+
+## Props
+
+<Props of={Select} />

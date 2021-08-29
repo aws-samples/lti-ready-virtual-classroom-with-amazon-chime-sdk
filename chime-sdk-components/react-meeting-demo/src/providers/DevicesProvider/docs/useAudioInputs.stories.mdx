@@ -1,0 +1,70 @@
+import { Props } from '@storybook/addon-docs/blocks';
+import { useAudioInputs } from '../';
+
+<Meta title="SDK Hooks/useAudioInputs" />
+
+# useAudioInputs
+
+The `useAudioInputs` hook returns a list of the user's available `audio-input` devices, the currently selected device, and the error if device selection fails.
+
+## Return Value
+
+```javascript
+{
+  devices: [{
+    deviceId: string;
+    label: string;
+  }],
+
+  // The device ID of the currently selected device
+  selectedDevice: string | null
+
+  // The error if device selection fails
+  selectDeviceError?: Error | null
+}
+
+```
+
+## Importing
+
+```javascript
+import { useAudioInputs } from 'amazon-chime-sdk-component-library-react';
+```
+
+## Usage
+
+The hook depends on the `DevicesProvider`. If you are using `MeetingProvider`, it is rendered by default.
+
+```jsx
+import React from 'react';
+import {
+  MeetingProvider,
+  useAudioInputs
+} from 'amazon-chime-sdk-component-library-react';
+
+const App = () => (
+  <MeetingProvider>
+    <MyChild />
+  </MeetingProvider>
+);
+
+const MyChild = () => {
+  const { devices, selectedDevice, selectDeviceError } = useAudioInputs();
+  const items = devices.map(device => (
+    <li key={device.deviceId}>{device.label}</li>
+  ));
+
+  return (
+    <div>
+      <p>Current Selected DeviceId: {selectedDevice}</p>
+      <p>Devices</p>
+      <ul>{items}</ul>
+      {selectDeviceError && (<p>{selectDeviceError.message}<p/>)}
+    </div>
+  );
+};
+```
+
+## Props
+
+<Props of={useAudioInputs} />

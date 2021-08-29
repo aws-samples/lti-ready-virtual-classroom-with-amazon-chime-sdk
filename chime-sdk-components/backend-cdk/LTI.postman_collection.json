@@ -1,0 +1,573 @@
+{
+	"info": {
+		"_postman_id": "b47b6ddd-da6c-4f2b-a8dd-29c1b4526090",
+		"name": "LTI",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Token Generator",
+			"item": [
+				{
+					"name": "Donald Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"var token = jsonData.Authorization.split(' ')[1]",
+									"pm.environment.set(\"DonaldToken\", token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"participantId\": \"123\",\n    \"participantName\": \"Donald Duck\",\n    \"participantEmail\": \"donald.duck@amazon.com\",\n    \"participantRoles\": [ \"Administrator\", \"Moderator\", \"User\" ],\n    \"eventId\": \"test\",\n    \"tokenExpiresIn\": \"365d\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://qhs5dh5kha.execute-api.us-east-1.amazonaws.com/dev/token",
+							"protocol": "https",
+							"host": [
+								"qhs5dh5kha",
+								"execute-api",
+								"us-east-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"dev",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Court Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"var token = jsonData.Authorization.split(' ')[1]",
+									"pm.environment.set(\"CourtToken\", token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"participantId\": \"678\",\n    \"participantName\": \"Court Schuett\",\n    \"participantEmail\": \"schuettc@amazon.com\",\n    \"participantRoles\": [ \"User\" ],\n    \"eventId\": \"test\",\n    \"tokenExpiresIn\": \"365d\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://qhs5dh5kha.execute-api.us-east-1.amazonaws.com/dev/token",
+							"protocol": "https",
+							"host": [
+								"qhs5dh5kha",
+								"execute-api",
+								"us-east-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"dev",
+								"token"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Daisy Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = JSON.parse(responseBody);",
+									"var token = jsonData.Authorization.split(' ')[1]",
+									"pm.environment.set(\"DaisyToken\", token);"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"participantId\": \"456\",\n    \"participantName\": \"Daisy Duck\",\n    \"participantEmail\": \"donald.duck@amazon.com\",\n    \"participantRoles\": [ \"Administrator\", \"Moderator\", \"User\" ],\n    \"eventId\": \"test\",\n    \"tokenExpiresIn\": \"365d\"\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "https://qhs5dh5kha.execute-api.us-east-1.amazonaws.com/dev/token",
+							"protocol": "https",
+							"host": [
+								"qhs5dh5kha",
+								"execute-api",
+								"us-east-1",
+								"amazonaws",
+								"com"
+							],
+							"path": [
+								"dev",
+								"token"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Basic End",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{DonaldToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"EventID\": \"test\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}end",
+					"host": [
+						"{{API_URL}}end"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Donald Join",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{DonaldToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}/join/tuhlw79kwq-dfasd223fdfsrr",
+					"host": [
+						"{{API_URL}}"
+					],
+					"path": [
+						"join",
+						"tuhlw79kwq-dfasd223fdfsrr"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Basic Modify",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{DonaldToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"EventID\": \"test\",\n    \"ParticipantInfo\": {\n        \"ParticipantID\": \"123\",\n        \"Permissions\": {\n            \"CanDemote\": true,\n            \"CanPromote\": false,\n            \"CanEnd\": true,\n            \"CanVideo\": true,\n            \"CanUnmute\": true,\n            \"CanShare\": true,\n            \"CanKick\": true\n        },\n        \"ParticipantName\": \"Jane Smith\",\n        \"RoleID\": \"User\"\n    }\n}"
+				},
+				"url": {
+					"raw": "{{API_URL}}modifyUser",
+					"host": [
+						"{{API_URL}}modifyUser"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Basic Attendee",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{DonaldToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"EventID\": \"test\",\n    \"AttendeeID\": \"d-4cef-6edf-72f2-42891fb34991\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}attendee/test",
+					"host": [
+						"{{API_URL}}attendee"
+					],
+					"path": [
+						"test"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Basic Info",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{DonaldToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"EventID\": \"test\",\n    \"ParticipantID\": \"678\"\n}"
+				},
+				"url": {
+					"raw": "{{API_URL}}info",
+					"host": [
+						"{{API_URL}}info"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Daisy Join",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{DaisyToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}join/test",
+					"host": [
+						"{{API_URL}}join"
+					],
+					"path": [
+						"test"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Court Join",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{CourtToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{API_URL}}join/test",
+					"host": [
+						"{{API_URL}}join"
+					],
+					"path": [
+						"test"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Basic Setup",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{DonaldToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"Title\": \"Test Meeting\"\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{API_URL}}setup/test",
+					"host": [
+						"{{API_URL}}setup"
+					],
+					"path": [
+						"test"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Basic Query",
+			"request": {
+				"auth": {
+					"type": "bearer",
+					"bearer": [
+						{
+							"key": "token",
+							"value": "{{DonaldToken}}",
+							"type": "string"
+						}
+					]
+				},
+				"method": "POST",
+				"header": [
+					{
+						"key": "",
+						"value": "",
+						"type": "text",
+						"disabled": true
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": ""
+				},
+				"url": {
+					"raw": "{{API_URL}}query/test",
+					"host": [
+						"{{API_URL}}query"
+					],
+					"path": [
+						"test"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "oauth2",
+		"oauth2": [
+			{
+				"key": "tokenType",
+				"value": "Bearer",
+				"type": "string"
+			},
+			{
+				"key": "accessToken",
+				"value": "eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCIsImtpZCI6Ino3Smc3YlBBbHRZaHVvOFB1OGNKdCJ9.eyJpc3MiOiJodHRwczovL2Rldi1qYm9remptdS51cy5hdXRoMC5jb20vIiwic3ViIjoiUHVpOG5mckxiRVM4cW5IUHhHZ0VtMVZsUXY4OUJzUUJAY2xpZW50cyIsImF1ZCI6Imh0dHBzOi8vYXV0aDAtand0LWF1dGhvcml6ZXIiLCJpYXQiOjE2MjI3NDQ4NDAsImV4cCI6MTYyMjgzMTI0MCwiYXpwIjoiUHVpOG5mckxiRVM4cW5IUHhHZ0VtMVZsUXY4OUJzUUIiLCJndHkiOiJjbGllbnQtY3JlZGVudGlhbHMifQ.KUGtJugQfPzy6QO-bcZ5Qj46vwFkvcqFq9FnagHTN71NMy6W5TEnmueOphaJc-WcFE-3tNWpc9UP3h3Km-PGgLsdmA4jmGZSXHV2qGMyav2reUQqqH5p4eIdNkqNMxa-KkLv8RuAcLo4cKaqZdsTmfiQKWH1nciUsZFMokxkRTVrrUdg9K-0S9uNWfbQTVmIoXLcA2Foq2GcrLRgbJz1n1Um_RVuPykTum9Df-D0svnkiDXNW2zWexNaGHVqOdroBi2-1auUx_MZDAZCwqRIM3ikAI6FVkHdWi9Pc8rs2uyj5-PhtFuOkLQPsOpP3k6wIF4dnzaerUJ5b_Q0Tlw1sQ",
+				"type": "string"
+			},
+			{
+				"key": "audience",
+				"value": {
+					"603b3762-ca2d-40ee-b86d-fd9bb35fa2a9": "https://auth0-jwt-authorizer"
+				},
+				"type": "any"
+			},
+			{
+				"key": "clientSecret",
+				"value": "{{auth0_clientSecret}}",
+				"type": "string"
+			},
+			{
+				"key": "accessTokenUrl",
+				"value": "{{auth0_tokenUrl}}",
+				"type": "string"
+			},
+			{
+				"key": "clientId",
+				"value": "{{auth0_clientID}}",
+				"type": "string"
+			},
+			{
+				"key": "grant_type",
+				"value": "client_credentials",
+				"type": "string"
+			},
+			{
+				"key": "tokenName",
+				"value": "auth0",
+				"type": "string"
+			},
+			{
+				"key": "addTokenTo",
+				"value": "header",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}

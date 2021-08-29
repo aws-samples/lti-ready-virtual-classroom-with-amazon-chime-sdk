@@ -1,0 +1,333 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Lambda Function resource stack creation using Amplify CLI",
+  "Parameters": {
+    "CloudWatchRule": {
+      "Type": "String",
+      "Default": "NONE",
+      "Description": " Schedule Expression"
+    },
+    "deploymentBucketName": {
+      "Type": "String"
+    },
+    "env": {
+      "Type": "String"
+    },
+    "s3Key": {
+      "Type": "String"
+    },
+    "storagedynamoEventsMetricsArn": {
+      "Type": "String"
+    },
+    "storagedynamoEventsMetricsName": {
+      "Type": "String"
+    },
+    "analyticschimeMeetingEventsProcessingAnalyticsResultOutputLocationArn": {
+      "Type": "String"
+    },
+    "analyticschimeMeetingEventsProcessingAnalyticsWorkGroupName": {
+      "Type": "String"
+    },
+    "analyticschimeMeetingEventsProcessingAnalyticsDatabaseName": {
+      "Type": "String",
+      "Default": ""
+    }
+  },
+  "Conditions": {
+    "ShouldNotCreateEnvResources": {
+      "Fn::Equals": [
+        {
+          "Ref": "env"
+        },
+        "NONE"
+      ]
+    }
+  },
+  "Resources": {
+    "SqsAthenaQueryJobs": {
+      "Type": "AWS::SQS::Queue",
+      "Properties": {
+        "MessageRetentionPeriod": 3600,
+        "DelaySeconds": 60,
+        "RedrivePolicy": {
+          "deadLetterTargetArn": {
+            "Fn::GetAtt": [
+              "SqsAthenaQueryJobsDeadletter",
+              "Arn"
+            ]
+          },
+          "maxReceiveCount": 2
+        }
+      }
+    },
+    "SqsAthenaQueryJobsDeadletter": {
+      "Type": "AWS::SQS::Queue"
+    },
+    "LambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Metadata": {
+        "aws:asset:path": "./src",
+        "aws:asset:property": "Code"
+      },
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "deploymentBucketName"
+          },
+          "S3Key": {
+            "Ref": "s3Key"
+          }
+        },
+        "Handler": "index.handler",
+        "FunctionName": {
+          "Fn::If": [
+            "ShouldNotCreateEnvResources",
+            "chimeMetricsResultProcessor",
+            {
+              "Fn::Join": [
+                "",
+                [
+                  "chimeMetricsResultProcessor",
+                  "-",
+                  {
+                    "Ref": "env"
+                  }
+                ]
+              ]
+            }
+          ]
+        },
+        "Environment": {
+          "Variables": {
+            "ENV": {
+              "Ref": "env"
+            },
+            "REGION": {
+              "Ref": "AWS::Region"
+            },
+            "METRICS_TABLE": {
+              "Ref": "storagedynamoEventsMetricsName"
+            },
+            "QUERY_JOBS_QUEUE_URL": {
+              "Ref": "SqsAthenaQueryJobs"
+            }
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "LambdaExecutionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Layers": [],
+        "Timeout": 25
+      }
+    },
+    "LambdaExecutionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": {
+          "Fn::If": [
+            "ShouldNotCreateEnvResources",
+            "chimeLambdaRole4ece36e1",
+            {
+              "Fn::Join": [
+                "",
+                [
+                  "chimeLambdaRole4ece36e1",
+                  "-",
+                  {
+                    "Ref": "env"
+                  }
+                ]
+              ]
+            }
+          ]
+        },
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "LambdaResourcePolicy": {
+      "Type": "AWS::Lambda::Permission",
+      "Properties": {
+        "FunctionName": {
+          "Ref": "LambdaFunction"
+        },
+        "Principal": "sqs.amazonaws.com",
+        "Action": "lambda:InvokeFunction",
+        "SourceArn": {
+          "Fn::GetAtt": [
+            "SqsAthenaQueryJobs",
+            "Arn"
+          ]
+        }
+      }
+    },
+    "lambdaexecutionpolicy": {
+      "DependsOn": [
+        "LambdaExecutionRole"
+      ],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "lambda-execution-policy",
+        "Roles": [
+          {
+            "Ref": "LambdaExecutionRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+              ],
+              "Resource": {
+                "Fn::Sub": [
+                  "arn:aws:logs:${region}:${account}:log-group:/aws/lambda/${lambda}:log-stream:*",
+                  {
+                    "region": {
+                      "Ref": "AWS::Region"
+                    },
+                    "account": {
+                      "Ref": "AWS::AccountId"
+                    },
+                    "lambda": {
+                      "Ref": "LambdaFunction"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:GetItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:PutItem"
+              ],
+              "Resource": {
+                "Ref": "storagedynamoEventsMetricsArn"
+              }
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "sqs:ReceiveMessage",
+                "sqs:DeleteMessage",
+                "sqs:GetQueueAttributes",
+                "sqs:ChangeMessageVisibility"
+              ],
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "SqsAthenaQueryJobs",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::GetAtt": [
+                    "SqsAthenaQueryJobsDeadletter",
+                    "Arn"
+                  ]
+                }
+              ]
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:GetObject"
+              ],
+              "Resource": {
+                "Ref": "analyticschimeMeetingEventsProcessingAnalyticsResultOutputLocationArn"
+              }
+            },
+            {
+              "Sid": "",
+              "Effect": "Allow",
+              "Action": [
+                "athena:GetQueryResults",
+                "athena:GetQueryExecution"
+              ],
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:aws:athena:${region}:${account}:workgroup/${workgroup}",
+                    {
+                      "region": {
+                        "Ref": "AWS::Region"
+                      },
+                      "account": {
+                        "Ref": "AWS::AccountId"
+                      },
+                      "workgroup": {
+                        "Ref": "analyticschimeMeetingEventsProcessingAnalyticsWorkGroupName"
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "Name": {
+      "Value": {
+        "Ref": "LambdaFunction"
+      }
+    },
+    "Arn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "LambdaFunction",
+          "Arn"
+        ]
+      }
+    },
+    "Region": {
+      "Value": {
+        "Ref": "AWS::Region"
+      }
+    },
+    "LambdaExecutionRole": {
+      "Value": {
+        "Ref": "LambdaExecutionRole"
+      }
+    },
+    "SqsAthenaJobsQueueUrl": {
+      "Value": {
+        "Ref": "SqsAthenaQueryJobs"
+      }
+    },
+    "SqsAthenaJobsQueueArn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "SqsAthenaQueryJobs",
+          "Arn"
+        ]
+      }
+    }
+  }
+}

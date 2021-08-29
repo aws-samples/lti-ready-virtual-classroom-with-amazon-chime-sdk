@@ -1,0 +1,64 @@
+{
+  "paths": [
+    {
+      "name": "/auth",
+      "lambdaFunction": "chimeLtiApiAuth",
+      "privacy": {
+        "open": true
+      },
+      "policyResourceName": "/auth"
+    },
+    {
+      "name": "/login",
+      "lambdaFunction": "chimeLtiApiLogin",
+      "privacy": {
+        "open": true
+      },
+      "policyResourceName": "/login"
+    },
+    {
+      "name": "/jwk",
+      "lambdaFunction": "chimeLtiApiJwk",
+      "privacy": {
+        "open": true
+      },
+      "policyResourceName": "/jwk"
+    }
+  ],
+  "resourceName": "chimeLtiApi",
+  "apiName": "chimeLtiApi",
+  "functionArns": [
+    {
+      "lambdaFunction": "chimeLtiApiAuth"
+    },
+    {
+      "lambdaFunction": "chimeLtiApiLogin"
+    },
+    {
+      "lambdaFunction": "chimeLtiApiJwk"
+    }
+  ],
+  "privacy": {
+    "auth": 0,
+    "unauth": 0,
+    "authRoleName": "amplify-chime-dev-140518-authRole",
+    "unAuthRoleName": "amplify-chime-dev-140518-unauthRole"
+  },
+  "dependsOn": [
+    {
+      "category": "function",
+      "resourceName": "chimeLtiApiAuth",
+      "attributes": ["Name", "Arn"]
+    },
+    {
+      "category": "function",
+      "resourceName": "chimeLtiApiLogin",
+      "attributes": ["Name", "Arn"]
+    },
+    {
+      "category": "function",
+      "resourceName": "chimeLtiApiJwk",
+      "attributes": ["Name", "Arn"]
+    }
+  ]
+}

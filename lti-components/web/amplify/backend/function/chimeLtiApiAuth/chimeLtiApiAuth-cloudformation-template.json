@@ -1,0 +1,289 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Chime LTI > API function to forward provider to the LTI tool",
+  "Parameters": {
+    "CloudWatchRule": {
+      "Type": "String",
+      "Default": "NONE",
+      "Description": " Schedule Expression"
+    },
+    "deploymentBucketName": {
+      "Type": "String"
+    },
+    "env": {
+      "Type": "String"
+    },
+    "s3Key": {
+      "Type": "String"
+    },
+    "hostingS3AndCloudFrontCloudFrontSecureURL": {
+      "Type": "String"
+    },
+    "storagedynamoPlatformsArn": {
+      "Type": "String"
+    },
+    "storagedynamoPlatformsName": {
+      "Type": "String"
+    },
+    "storagedynamoEventGroupsArn": {
+      "Type": "String"
+    },
+    "storagedynamoEventGroupsName": {
+      "Type": "String"
+    },
+    "securitytokenSecretArn": {
+      "Type": "String"
+    },
+    "securitytokenSecretName": {
+      "Type": "String"
+    },
+    "analyticschimeMeetingEventsProcessingAnalyticsBucketName": {
+      "Type": "String"
+    },
+    "analyticschimeMeetingEventsProcessingAnalyticsBucketArn": {
+      "Type": "String"
+    },
+    "analyticschimeMeetingEventsProcessingAnalyticsBucketUserFolderName": {
+      "Type": "String"
+    }
+  },
+  "Conditions": {
+    "ShouldNotCreateEnvResources": {
+      "Fn::Equals": [
+        {
+          "Ref": "env"
+        },
+        "NONE"
+      ]
+    }
+  },
+  "Resources": {
+    "LambdaFunction": {
+      "Type": "AWS::Lambda::Function",
+      "Metadata": {
+        "aws:asset:path": "./src",
+        "aws:asset:property": "Code"
+      },
+      "Properties": {
+        "Code": {
+          "S3Bucket": {
+            "Ref": "deploymentBucketName"
+          },
+          "S3Key": {
+            "Ref": "s3Key"
+          }
+        },
+        "Handler": "index.handler",
+        "FunctionName": {
+          "Fn::If": [
+            "ShouldNotCreateEnvResources",
+            "chimeLtiApiAuth",
+            {
+              "Fn::Join": [
+                "",
+                [
+                  "chimeLtiApiAuth",
+                  "-",
+                  {
+                    "Ref": "env"
+                  }
+                ]
+              ]
+            }
+          ]
+        },
+        "Environment": {
+          "Variables": {
+            "ENV": {
+              "Ref": "env"
+            },
+            "REGION": {
+              "Ref": "AWS::Region"
+            },
+            "WEB_FRONTEND_URL": {
+              "Ref": "hostingS3AndCloudFrontCloudFrontSecureURL"
+            },
+            "STORED_SECRET": {
+              "Ref": "securitytokenSecretArn"
+            },
+            "PLATFORM_TABLE": {
+              "Ref": "storagedynamoPlatformsName"
+            },
+            "EVENTGROUPS_TABLE": {
+              "Ref": "storagedynamoEventGroupsName"
+            },
+            "ANALYTICS_BUCKET_NAME": {
+              "Ref": "analyticschimeMeetingEventsProcessingAnalyticsBucketName"
+            },
+            "ANALYTICS_BUCKET_USER_FOLDER": {
+              "Ref": "analyticschimeMeetingEventsProcessingAnalyticsBucketUserFolderName"
+            }
+          }
+        },
+        "Role": {
+          "Fn::GetAtt": [
+            "LambdaExecutionRole",
+            "Arn"
+          ]
+        },
+        "Runtime": "nodejs14.x",
+        "Layers": [],
+        "Timeout": "25"
+      }
+    },
+    "LambdaExecutionRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "RoleName": {
+          "Fn::If": [
+            "ShouldNotCreateEnvResources",
+            "chimeLambdaRole6483cacf",
+            {
+              "Fn::Join": [
+                "",
+                [
+                  "chimeLambdaRole6483cacf",
+                  "-",
+                  {
+                    "Ref": "env"
+                  }
+                ]
+              ]
+            }
+          ]
+        },
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "lambda.amazonaws.com"
+                ]
+              },
+              "Action": [
+                "sts:AssumeRole"
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "lambdaexecutionpolicy": {
+      "DependsOn": [
+        "LambdaExecutionRole"
+      ],
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyName": "lambda-execution-policy",
+        "Roles": [
+          {
+            "Ref": "LambdaExecutionRole"
+          }
+        ],
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Action": [
+                "logs:CreateLogGroup",
+                "logs:CreateLogStream",
+                "logs:PutLogEvents"
+              ],
+              "Resource": {
+                "Fn::Sub": [
+                  "arn:aws:logs:${region}:${account}:log-group:/aws/lambda/${lambda}:log-stream:*",
+                  {
+                    "region": {
+                      "Ref": "AWS::Region"
+                    },
+                    "account": {
+                      "Ref": "AWS::AccountId"
+                    },
+                    "lambda": {
+                      "Ref": "LambdaFunction"
+                    }
+                  }
+                ]
+              }
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "secretsmanager:GetSecretValue",
+                "secretsmanager:UpdateSecret"
+              ],
+              "Resource": {
+                "Ref": "securitytokenSecretArn"
+              }
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:GetItem"
+              ],
+              "Resource": {
+                "Ref": "storagedynamoPlatformsArn"
+              }
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "dynamodb:GetItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:PutItem"
+              ],
+              "Resource": {
+                "Ref": "storagedynamoEventGroupsArn"
+              }
+            },
+            {
+              "Effect": "Allow",
+              "Action": [
+                "s3:PutObject"
+              ],
+              "Resource": {
+                "Fn::Join": [
+                  "/",
+                  [
+                    {
+                      "Ref": "analyticschimeMeetingEventsProcessingAnalyticsBucketArn"
+                    },
+                    "*"
+                  ]
+                ]
+              }
+            }
+          ]
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "Name": {
+      "Value": {
+        "Ref": "LambdaFunction"
+      }
+    },
+    "Arn": {
+      "Value": {
+        "Fn::GetAtt": [
+          "LambdaFunction",
+          "Arn"
+        ]
+      }
+    },
+    "Region": {
+      "Value": {
+        "Ref": "AWS::Region"
+      }
+    },
+    "LambdaExecutionRole": {
+      "Value": {
+        "Ref": "LambdaExecutionRole"
+      }
+    }
+  }
+}

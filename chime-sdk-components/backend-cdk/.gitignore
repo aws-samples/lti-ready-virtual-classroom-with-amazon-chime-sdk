@@ -1,0 +1,12 @@
+node_modules/
+package-lock.json
+cdk.out/
+index.js
+lib/*.js
+.eslintcache
+cdk.context.json
+cdk-outputs.json
+.DS_Store
+yarn.lock
+auth.json
+constants/*.js

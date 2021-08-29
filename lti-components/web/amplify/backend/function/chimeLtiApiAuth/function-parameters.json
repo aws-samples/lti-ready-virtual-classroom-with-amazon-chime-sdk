@@ -1,0 +1,42 @@
+{
+  "lambdaLayers": [],
+  "hostingS3AndCloudFrontCloudFrontSecureURL": {
+    "Fn::GetAtt": ["hostingS3AndCloudFront", "Outputs.CloudFrontSecureURL"]
+  },
+  "storagedynamoPlatformsArn": {
+    "Fn::GetAtt": ["storagedynamoPlatforms", "Outputs.Arn"]
+  },
+  "storagedynamoPlatformsName": {
+    "Fn::GetAtt": ["storagedynamoPlatforms", "Outputs.Name"]
+  },
+  "storagedynamoEventGroupsArn": {
+    "Fn::GetAtt": ["dynamoEventGroups", "Outputs.Arn"]
+  },
+  "storagedynamoEventGroupsName": {
+    "Fn::GetAtt": ["dynamoEventGroups", "Outputs.Name"]
+  },
+  "securitytokenSecretArn": {
+    "Fn::GetAtt": ["securitytokenSecret", "Outputs.Arn"]
+  },
+  "securitytokenSecretName": {
+    "Fn::GetAtt": ["securitytokenSecret", "Outputs.Name"]
+  },
+  "analyticschimeMeetingEventsProcessingAnalyticsBucketUserFolderName": {
+    "Fn::GetAtt": [
+      "analyticschimeMeetingEventsProcessing",
+      "Outputs.AnalyticsBucketUserFolderName"
+    ]
+  },
+  "analyticschimeMeetingEventsProcessingAnalyticsBucketName": {
+    "Fn::GetAtt": [
+      "analyticschimeMeetingEventsProcessing",
+      "Outputs.AnalyticsBucketName"
+    ]
+  },
+  "analyticschimeMeetingEventsProcessingAnalyticsBucketArn": {
+    "Fn::GetAtt": [
+      "analyticschimeMeetingEventsProcessing",
+      "Outputs.AnalyticsBucketArn"
+    ]
+  }
+}

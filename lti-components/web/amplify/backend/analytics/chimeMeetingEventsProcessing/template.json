@@ -1,0 +1,709 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Chime LTI > Resources to capture and store Chime meeting events",
+  "Parameters": {
+    "env": {
+      "Type": "String"
+    },
+    "tableNameMeetingEvents": {
+      "Type": "String",
+      "Default": "chime_lti_meeting_events"
+    },
+    "tableNameUsers": {
+      "Type": "String",
+      "Default": "chime_lti_users"
+    },
+    "tableNameEvents": {
+      "Type": "String",
+      "Default": "chime_lti_events"
+    },
+    "batchIntervalSeconds": {
+      "Type": "Number",
+      "MinValue": 60,
+      "MaxValue": 900,
+      "Default": 60
+    }
+  },
+  "Conditions": {
+    "ShouldNotCreateEnvResources": {
+      "Fn::Equals": [
+        {
+          "Ref": "env"
+        },
+        "NONE"
+      ]
+    }
+  },
+  "Resources": {
+    "S3Bucket": {
+      "Type": "AWS::S3::Bucket",
+      "DeletionPolicy": "Retain"
+    },
+    "FirehoseDeliveryStream": {
+      "Type": "AWS::KinesisFirehose::DeliveryStream",
+      "Description": "Receives Chime meeting events from EventBridge to batch and store in the S3 analytics bucket.",
+      "Properties": {
+        "DeliveryStreamType": "DirectPut",
+        "S3DestinationConfiguration": {
+          "BucketARN": {
+            "Fn::GetAtt": ["S3Bucket", "Arn"]
+          },
+          "BufferingHints": {
+            "IntervalInSeconds": {
+              "Ref": "batchIntervalSeconds"
+            }
+          },
+          "ErrorOutputPrefix": "meetingsErrors/",
+          "Prefix": "meetings/",
+          "RoleARN": {
+            "Fn::GetAtt": ["FirehoseDeliveryStreamIamRole", "Arn"]
+          }
+        }
+      }
+    },
+    "FirehoseDeliveryStreamIamRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "Path": "/service-role/",
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "firehose.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Description": "Provides write access to S3 destination",
+        "Policies": [
+          {
+            "PolicyName": "FirehoseDeliveryStreamToS3ServiceRole",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Sid": "",
+                  "Effect": "Allow",
+                  "Action": [
+                    "s3:AbortMultipartUpload",
+                    "s3:GetBucketLocation",
+                    "s3:GetObject",
+                    "s3:ListBucket",
+                    "s3:ListBucketMultipartUploads",
+                    "s3:PutObject"
+                  ],
+                  "Resource": [
+                    {
+                      "Fn::GetAtt": ["S3Bucket", "Arn"]
+                    },
+                    {
+                      "Fn::Join": [
+                        "/",
+                        [
+                          {
+                            "Fn::GetAtt": ["S3Bucket", "Arn"]
+                          },
+                          "*"
+                        ]
+                      ]
+                    }
+                  ]
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "EventBridgeRuleToFirehoseDeliveryStreamIamRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "Path": "/service-role/",
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "events.amazonaws.com"
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Description": "Provides write access for EventBridge rule to Firehose delivery stream",
+        "Policies": [
+          {
+            "PolicyName": "FirehoseDeliveryStreamToS3ServiceRole",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": ["firehose:PutRecord", "firehose:PutRecordBatch"],
+                  "Resource": {
+                    "Fn::GetAtt": ["FirehoseDeliveryStream", "Arn"]
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "EventBridgeRule": {
+      "Type": "AWS::Events::Rule",
+      "Properties": {
+        "Description": "Write Chime state change events to Kinesis Firehose delivery stream",
+        "EventPattern": {
+          "source": ["aws.chime"],
+          "detail-type": ["Chime Meeting State Change"],
+          "detail": {
+            "eventType": [
+              "chime:MeetingStarted",
+              "chime:MeetingEnded",
+              "chime:AttendeeRemoved",
+              "chime:AttendeeJoined",
+              "chime:AttendeeLeft",
+              "chime:AttendeeDropped",
+              "chime:AttendeeVideoStarted",
+              "chime:AttendeeVideoStopped",
+              "chime:AttendeeContentVideoStarted",
+              "chime:AttendeeContentVideoStopped",
+              "chime:AttendeeScreenShareStarted",
+              "chime:AttendeeScreenShareStopped"
+            ]
+          }
+        },
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "EventBridgeRuleToFirehoseDeliveryStreamIamRole",
+            "Arn"
+          ]
+        },
+        "State": "ENABLED",
+        "Targets": [
+          {
+            "Arn": {
+              "Fn::GetAtt": ["FirehoseDeliveryStream", "Arn"]
+            },
+            "Id": "kinesisChimeEvents",
+            "InputTransformer": {
+              "InputPathsMap": {
+                "attendeeId": "$.detail.attendeeId",
+                "eventType": "$.detail.eventType",
+                "externalMeetingId": "$.detail.externalMeetingId",
+                "externalUserId": "$.detail.externalUserId",
+                "mediaRegion": "$.detail.mediaRegion",
+                "meetingId": "$.detail.meetingId",
+                "time": "$.time"
+              },
+              "InputTemplate": "{\"eventType\": <eventType>,\"time\": <time>,\"meetingId\": <meetingId>,\"attendeeId\": <attendeeId>,\"externalUserId\": <externalUserId>,\"externalMeetingId\": <externalMeetingId>,\"mediaRegion\": <mediaRegion>}\n"
+            },
+            "RoleArn": {
+              "Fn::GetAtt": [
+                "EventBridgeRuleToFirehoseDeliveryStreamIamRole",
+                "Arn"
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "AthenaWorkgroup": {
+      "Type": "AWS::Athena::WorkGroup",
+      "Properties": {
+        "Name": {
+          "Fn::Join": [
+            "_",
+            [
+              "chimeLtiMeetingAnalytics",
+              {
+                "Ref": "env"
+              }
+            ]
+          ]
+        },
+        "State": "ENABLED",
+        "WorkGroupConfiguration": {
+          "ResultConfiguration": {
+            "OutputLocation": {
+              "Fn::Join": [
+                "/",
+                [
+                  "s3:/",
+                  {
+                    "Ref": "S3Bucket"
+                  },
+                  "athena/query/results"
+                ]
+              ]
+            }
+          }
+        }
+      }
+    },
+    "GlueDatabase": {
+      "Type": "AWS::Glue::Database",
+      "Properties": {
+        "CatalogId": {
+          "Ref": "AWS::AccountId"
+        },
+        "DatabaseInput": {
+          "Name": {
+            "Fn::Join": [
+              "_",
+              [
+                "chime_lti_meeting_analytics_database",
+                {
+                  "Ref": "env"
+                }
+              ]
+            ]
+          }
+        }
+      }
+    },
+    "AthenaQueryPairMeetingEvents": {
+      "Type" : "AWS::Athena::NamedQuery",
+      "Properties" : {
+          "Database" : {
+            "Ref": "GlueDatabase"
+          },
+          "WorkGroup" : {
+            "Ref": "AthenaWorkgroup"
+          },
+          "Description" : "Correlates Chime meeting events as pairs and augments them with user and event info.",
+          "Name" : "Augmented Chime meetings event pairs",
+          "QueryString" : {
+            "Fn::Sub": [
+              "SELECT  eventpair.*, events.*, users.* FROM ((( SELECT startEvent.meetingid , startEvent.attendeeid , startEvent.eventtype event , startEvent.time started   , \"min\"(\"date_diff\"('second', startEvent.time, endEvent.time)) duration , startEvent.externalmeetingid , startEvent.externaluserid FROM (${tableMeetings} startEvent LEFT JOIN ${tableMeetings} endEvent ON ((((startEvent.meetingid = endEvent.meetingid) AND (startEvent.attendeeid = endEvent.attendeeid)) AND (((((startEvent.eventtype = 'chime:MeetingStarted') AND (endEvent.eventtype = 'chime:MeetingEnded')) OR ((startEvent.eventtype = 'chime:AttendeeJoined') AND (endEvent.eventtype = 'chime:AttendeeLeft'))) OR ((startEvent.eventtype = 'chime:AttendeeContentVideoStarted') AND (endEvent.eventtype = 'chime:AttendeeContentVideoStopped'))) OR ((startEvent.eventtype = 'chime:AttendeeVideoStarted') AND (endEvent.eventtype = 'chime:AttendeeVideoStopped')))) AND (endEvent.time > startEvent.time))) WHERE (startEvent.eventtype IN ('chime:MeetingStarted', 'chime:AttendeeJoined', 'chime:AttendeeContentVideoStarted', 'chime:AttendeeVideoStarted')) GROUP BY startEvent.meetingid, startEvent.attendeeid, startEvent.externalmeetingid, startEvent.externaluserid, startEvent.eventtype, startEvent.time ORDER BY started DESC) eventPair LEFT JOIN ${tableUsers} users ON (users.id = eventPair.externaluserid)) LEFT JOIN ${tableEvents} events ON (events.externaleventid = eventPair.externalmeetingid))",
+              {
+                "tableMeetings": {
+                  "Ref": "tableNameMeetingEvents"
+                },
+                "tableEvents": {
+                  "Ref": "tableNameEvents"
+                },
+                "tableUsers": {
+                  "Ref": "tableNameUsers"
+                }
+              }
+            ]
+          }
+        }
+    },
+    "AthenaQueryCreateViewPairMeetingEvents": {
+      "Type" : "AWS::Athena::NamedQuery",
+      "Properties" : {
+          "Database" : {
+            "Ref": "GlueDatabase"
+          },
+          "WorkGroup" : {
+            "Ref": "AthenaWorkgroup"
+          },
+          "Description" : "Creates view which correlates Chime meeting events as pairs and augments them with user and event info.",
+          "Name" : "Create view of augmented Chime meetings event pairs",
+          "QueryString" : {
+            "Fn::Join": [
+              " ",
+              [
+                "CREATE OR REPLACE VIEW meeting_events_paired AS",
+                {
+                  "Fn::Sub": [
+                    "SELECT  eventpair.*, events.*, users.* FROM ((( SELECT startEvent.meetingid , startEvent.attendeeid , startEvent.eventtype event , startEvent.time started   , \"min\"(\"date_diff\"('second', startEvent.time, endEvent.time)) duration , startEvent.externalmeetingid , startEvent.externaluserid FROM (${tableMeetings} startEvent LEFT JOIN ${tableMeetings} endEvent ON ((((startEvent.meetingid = endEvent.meetingid) AND (startEvent.attendeeid = endEvent.attendeeid)) AND (((((startEvent.eventtype = 'chime:MeetingStarted') AND (endEvent.eventtype = 'chime:MeetingEnded')) OR ((startEvent.eventtype = 'chime:AttendeeJoined') AND (endEvent.eventtype = 'chime:AttendeeLeft'))) OR ((startEvent.eventtype = 'chime:AttendeeContentVideoStarted') AND (endEvent.eventtype = 'chime:AttendeeContentVideoStopped'))) OR ((startEvent.eventtype = 'chime:AttendeeVideoStarted') AND (endEvent.eventtype = 'chime:AttendeeVideoStopped')))) AND (endEvent.time > startEvent.time))) WHERE (startEvent.eventtype IN ('chime:MeetingStarted', 'chime:AttendeeJoined', 'chime:AttendeeContentVideoStarted', 'chime:AttendeeVideoStarted')) GROUP BY startEvent.meetingid, startEvent.attendeeid, startEvent.externalmeetingid, startEvent.externaluserid, startEvent.eventtype, startEvent.time ORDER BY started DESC) eventPair LEFT JOIN ${tableUsers} users ON (users.id = eventPair.externaluserid)) LEFT JOIN ${tableEvents} events ON (events.externaleventid = eventPair.externalmeetingid))",
+                    {
+                      "tableMeetings": {
+                        "Ref": "tableNameMeetingEvents"
+                      },
+                      "tableEvents": {
+                        "Ref": "tableNameEvents"
+                      },
+                      "tableUsers": {
+                        "Ref": "tableNameUsers"
+                      }
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        }
+    },
+    "AthenaQueryAggregateMeetingEvents": {
+      "Type" : "AWS::Athena::NamedQuery",
+      "Properties" : {
+          "Database" : {
+            "Ref": "GlueDatabase"
+          },
+          "WorkGroup" : {
+            "Ref": "AthenaWorkgroup"
+          },
+          "Description" : "Aggregates Chime meeting event pairs per event.",
+          "Name" : "Aggregated Chime meetings event pairs per event",
+          "QueryString" : {
+            "Fn::Sub": [
+              "SELECT eventpair.* , events.* FROM ( SELECT eventPairs.externalmeetingid, eventPairs.event, MIN(eventPairs.started) firstStart, COUNT(eventPairs.meetingId) totalCount, COUNT(distinct eventPairs.externaluserid) totalUsers, SUM(eventPairs.duration) totalDuration, MIN(eventPairs.duration) minDuration, MAX(eventPairs.duration) maxDuration FROM ( SELECT startEvent.meetingid , startEvent.attendeeid , startEvent.eventtype event , startEvent.time started , \"min\"(\"date_diff\"('second', startEvent.time, endEvent.time)) duration , startEvent.externalmeetingid , startEvent.externaluserid FROM ${tableMeetings} startEvent LEFT JOIN ${tableMeetings} endEvent ON startEvent.meetingid = endEvent.meetingid AND startEvent.attendeeid = endEvent.attendeeid AND ( (startEvent.eventtype = 'chime:MeetingStarted' AND endEvent.eventtype = 'chime:MeetingEnded') OR (startEvent.eventtype = 'chime:AttendeeJoined' AND endEvent.eventtype = 'chime:AttendeeLeft') OR (startEvent.eventtype = 'chime:AttendeeContentVideoStarted' AND endEvent.eventtype = 'chime:AttendeeContentVideoStopped') OR (startEvent.eventtype = 'chime:AttendeeVideoStarted' AND endEvent.eventtype = 'chime:AttendeeVideoStopped') ) AND endEvent.time > startEvent.time WHERE startEvent.eventtype IN ('chime:MeetingStarted', 'chime:AttendeeJoined', 'chime:AttendeeContentVideoStarted', 'chime:AttendeeVideoStarted') GROUP BY startEvent.meetingid, startEvent.attendeeid, startEvent.externalmeetingid, startEvent.externaluserid, startEvent.eventtype, startEvent.time ORDER BY started DESC ) eventPairs GROUP BY eventPairs.externalmeetingid, eventPairs.event) eventPair LEFT JOIN ${tableEvents} events ON (events.externaleventid = eventPair.externalmeetingid)",
+              {
+                "tableMeetings": {
+                  "Ref": "tableNameMeetingEvents"
+                },
+                "tableEvents": {
+                  "Ref": "tableNameEvents"
+                }
+              }
+            ]
+          }
+        }
+    },
+    "AthenaQueryCreateViewAggregateMeetingEvents": {
+      "Type" : "AWS::Athena::NamedQuery",
+      "Properties" : {
+          "Database" : {
+            "Ref": "GlueDatabase"
+          },
+          "WorkGroup" : {
+            "Ref": "AthenaWorkgroup"
+          },
+          "Description" : "Creates view which aggregates Chime meeting event pairs per event.",
+          "Name" : "Create view of aggregated Chime meetings event pairs per event",
+          "QueryString" : {
+            "Fn::Join": [
+              " ",
+              [
+                "CREATE OR REPLACE VIEW meeting_events_paired_aggregated AS",
+                {
+                  "Fn::Sub": [
+                    "SELECT eventpair.* , events.* FROM ( SELECT eventPairs.externalmeetingid, eventPairs.event, MIN(eventPairs.started) firstStart, COUNT(eventPairs.meetingId) totalCount, COUNT(distinct eventPairs.externaluserid) totalUsers, SUM(eventPairs.duration) totalDuration, MIN(eventPairs.duration) minDuration, MAX(eventPairs.duration) maxDuration FROM ( SELECT startEvent.meetingid , startEvent.attendeeid , startEvent.eventtype event , startEvent.time started , \"min\"(\"date_diff\"('second', startEvent.time, endEvent.time)) duration , startEvent.externalmeetingid , startEvent.externaluserid FROM ${tableMeetings} startEvent LEFT JOIN ${tableMeetings} endEvent ON startEvent.meetingid = endEvent.meetingid AND startEvent.attendeeid = endEvent.attendeeid AND ( (startEvent.eventtype = 'chime:MeetingStarted' AND endEvent.eventtype = 'chime:MeetingEnded') OR (startEvent.eventtype = 'chime:AttendeeJoined' AND endEvent.eventtype = 'chime:AttendeeLeft') OR (startEvent.eventtype = 'chime:AttendeeContentVideoStarted' AND endEvent.eventtype = 'chime:AttendeeContentVideoStopped') OR (startEvent.eventtype = 'chime:AttendeeVideoStarted' AND endEvent.eventtype = 'chime:AttendeeVideoStopped') ) AND endEvent.time > startEvent.time WHERE startEvent.eventtype IN ('chime:MeetingStarted', 'chime:AttendeeJoined', 'chime:AttendeeContentVideoStarted', 'chime:AttendeeVideoStarted') GROUP BY startEvent.meetingid, startEvent.attendeeid, startEvent.externalmeetingid, startEvent.externaluserid, startEvent.eventtype, startEvent.time ORDER BY started DESC ) eventPairs GROUP BY eventPairs.externalmeetingid, eventPairs.event) eventPair LEFT JOIN ${tableEvents} events ON (events.externaleventid = eventPair.externalmeetingid)",
+                    {
+                      "tableMeetings": {
+                        "Ref": "tableNameMeetingEvents"
+                      },
+                      "tableEvents": {
+                        "Ref": "tableNameEvents"
+                      }
+                    }
+                  ]
+                }
+              ]
+            ]
+          }
+        }
+    },
+    "GlueTableMeetingEvents": {
+      "Type": "AWS::Glue::Table",
+      "Properties": {
+        "CatalogId": {
+          "Ref": "AWS::AccountId"
+        },
+        "DatabaseName": {
+          "Ref": "GlueDatabase"
+        },
+        "TableInput": {
+          "Name": {
+            "Ref": "tableNameMeetingEvents"
+          },
+          "TableType": "EXTERNAL_TABLE",
+          "StorageDescriptor": {
+            "Columns": [
+              {
+                "Name": "eventtype",
+                "Type": "string"
+              },
+              {
+                "Name": "time",
+                "Type": "timestamp"
+              },
+              {
+                "Name": "meetingid",
+                "Type": "string"
+              },
+              {
+                "Name": "attendeeid",
+                "Type": "string"
+              },
+              {
+                "Name": "externaluserid",
+                "Type": "string"
+              },
+              {
+                "Name": "externalmeetingid",
+                "Type": "string"
+              },
+              {
+                "Name": "mediaregion",
+                "Type": "string"
+              }
+            ],
+            "InputFormat": "org.apache.hadoop.mapred.TextInputFormat",
+            "Location": {
+              "Fn::Join": [
+                "/",
+                [
+                  "s3:/",
+                  {
+                    "Ref": "S3Bucket"
+                  },
+                  "meetings"
+                ]
+              ]
+            },
+            "OutputFormat": "org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat",
+            "Parameters": {
+              "has_encrypted_data": "false"
+            },
+            "SerdeInfo": {
+              "Name": "org.openx.data.jsonserde.JsonSerDe",
+              "SerializationLibrary": "org.openx.data.jsonserde.JsonSerDe"
+            }
+          }
+        }
+      }
+    },
+    "GlueTableUsers": {
+      "Type": "AWS::Glue::Table",
+      "Properties": {
+        "CatalogId": {
+          "Ref": "AWS::AccountId"
+        },
+        "DatabaseName": {
+          "Ref": "GlueDatabase"
+        },
+        "TableInput": {
+          "Name": {
+            "Ref": "tableNameUsers"
+          },
+          "TableType": "EXTERNAL_TABLE",
+          "StorageDescriptor": {
+            "Columns": [
+              {
+                "Name": "id",
+                "Type": "string"
+              },
+              {
+                "Name": "name",
+                "Type": "string"
+              },
+              {
+                "Name": "email",
+                "Type": "string"
+              },
+              {
+                "Name": "externalId",
+                "Type": "string"
+              }
+            ],
+            "InputFormat": "org.apache.hadoop.mapred.TextInputFormat",
+            "Location": {
+              "Fn::Join": [
+                "/",
+                [
+                  "s3:/",
+                  {
+                    "Ref": "S3Bucket"
+                  },
+                  "users"
+                ]
+              ]
+            },
+            "OutputFormat": "org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat",
+            "Parameters": {
+              "has_encrypted_data": "false"
+            },
+            "SerdeInfo": {
+              "Name": "org.openx.data.jsonserde.JsonSerDe",
+              "SerializationLibrary": "org.openx.data.jsonserde.JsonSerDe"
+            }
+          }
+        }
+      }
+    },
+    "GlueTableEvents": {
+      "Type": "AWS::Glue::Table",
+      "Properties": {
+        "CatalogId": {
+          "Ref": "AWS::AccountId"
+        },
+        "DatabaseName": {
+          "Ref": "GlueDatabase"
+        },
+        "TableInput": {
+          "Name": {
+            "Ref": "tableNameEvents"
+          },
+          "TableType": "EXTERNAL_TABLE",
+          "StorageDescriptor": {
+            "Columns": [
+              {
+                "Name": "externalEventId",
+                "Type": "string"
+              },
+              {
+                "Name": "eventId",
+                "Type": "string"
+              },
+              {
+                "Name": "eventGroupId",
+                "Type": "string"
+              },
+              {
+                "Name": "eventGroupExternalId",
+                "Type": "string"
+              },
+              {
+                "Name": "eventGroupExternalTitle",
+                "Type": "string"
+              },
+              {
+                "Name": "scheduledAt",
+                "Type": "timestamp"
+              },
+              {
+                "Name": "scheduledDuration",
+                "Type": "int"
+              },
+              {
+                "Name": "hostInfo",
+                "Type": "string"
+              },
+              {
+                "Name": "hostUserId",
+                "Type": "string"
+              },
+              {
+                "Name": "hostUserName",
+                "Type": "string"
+              },
+              {
+                "Name": "title",
+                "Type": "string"
+              },
+              {
+                "Name": "detail",
+                "Type": "string"
+              }
+            ],
+            "InputFormat": "org.apache.hadoop.mapred.TextInputFormat",
+            "Location": {
+              "Fn::Join": [
+                "/",
+                [
+                  "s3:/",
+                  {
+                    "Ref": "S3Bucket"
+                  },
+                  "events"
+                ]
+              ]
+            },
+            "OutputFormat": "org.apache.hadoop.hive.ql.io.IgnoreKeyTextOutputFormat",
+            "Parameters": {
+              "has_encrypted_data": "false"
+            },
+            "SerdeInfo": {
+              "Name": "org.openx.data.jsonserde.JsonSerDe",
+              "SerializationLibrary": "org.openx.data.jsonserde.JsonSerDe"
+            }
+          }
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "Region": {
+      "Value": {
+        "Ref": "AWS::Region"
+      }
+    },
+    "AnalyticsWorkGroupName": {
+      "Description": "Name of Athena workgroup",
+      "Value": {
+        "Ref": "AthenaWorkgroup"
+      }
+    },
+    "AnalyticsBucketName": {
+      "Description": "Analytics bucket name",
+      "Value": {
+        "Ref": "S3Bucket"
+      }
+    },
+    "AnalyticsBucketArn": {
+      "Description": "Analytics bucket name",
+      "Value": {
+        "Fn::GetAtt": ["S3Bucket", "Arn"]
+      }
+    },
+    "NamedQueryIdPairMeetingEvents": {
+      "Description": "Id of named Athena query to aggregate meeting events",
+      "Value": {
+        "Fn::GetAtt": ["AthenaQueryPairMeetingEvents", "NamedQueryId"]
+      }
+    },
+    "NamedQueryIdAggregateMeetingEvents": {
+      "Description": "Id of named Athena query to aggregate meeting events",
+      "Value": {
+        "Fn::GetAtt": ["AthenaQueryAggregateMeetingEvents", "NamedQueryId"]
+      }
+    },
+    "AnalyticsBucketUserFolderName": {
+      "Description": "Analytics bucket name",
+      "Value": "users"
+    },
+    "AnalyticsBucketEventsFolderName": {
+      "Description": "Analytics bucket name",
+      "Value": "events"
+    },
+    "AnalyticsResultOutputLocation": {
+      "Description": "S3 output location for Athena query results",
+      "Value": {
+        "Fn::Join": [
+          "/",
+          [
+            "s3:/",
+            {
+              "Ref": "S3Bucket"
+            },
+            "athena/query/results"
+          ]
+        ]
+      }
+    },
+    "AnalyticsResultOutputLocationArn": {
+      "Description": "S3 output location ARN for Athena query results",
+      "Value": {
+        "Fn::Join": [
+          "/",
+          [
+            {
+              "Fn::GetAtt": ["S3Bucket", "Arn"]
+            },
+            "athena/query/results/*"
+          ]
+        ]
+      }
+    },
+    "AnalyticsDatabaseName": {
+      "Description": "Glue database name containing raw data tables and named queries",
+      "Value": {
+        "Ref": "GlueDatabase"
+      }
+    },
+    "S3BucketSecureURL": {
+      "Value": {
+        "Fn::Join": [
+          "",
+          [
+            "https://",
+            {
+              "Fn::GetAtt": ["S3Bucket", "DomainName"]
+            }
+          ]
+        ]
+      },
+      "Description": "Name of S3 bucket to hold website content"
+    }
+  }
+}

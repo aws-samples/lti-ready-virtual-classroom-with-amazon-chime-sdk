@@ -1,0 +1,56 @@
+import { Preview, Props } from '@storybook/addon-docs/blocks';
+import { ThemeProvider } from 'styled-components';
+
+import Heading from './';
+import { lightTheme } from '../../../theme/';
+import { GlobalStyles } from '../../../theme/GlobalStyles';
+
+# Heading
+
+The Heading component displays a title or subtitle on a webpage.
+
+## Importing
+
+```javascript
+import { Heading } from 'amazon-chime-sdk-component-library-react';
+```
+
+## Example
+
+Heading rendered as a paragraph with color `blue`, `level = 3`.
+
+<ThemeProvider theme={lightTheme}>
+  <GlobalStyles/>
+  <Preview>
+    <Heading style={{ color: "blue"}} level={3} tag="p">
+      Change my level or as prop
+    </Heading>
+  </Preview>
+</ThemeProvider>
+
+```jsx
+<Heading style={{ color: "blue"}} level={3} tag="p">
+  Change my level or as prop
+</Heading>
+```
+
+Heading rendered as an anchor with color `palevioletred`, `level = 5`.
+
+<ThemeProvider theme={lightTheme}>
+  <GlobalStyles/>
+  <Preview>
+    <Heading style={{ color: "palevioletred"}} level={5} tag="a">
+      A tag
+    </Heading>
+  </Preview>
+</ThemeProvider>
+
+```jsx
+<Heading style={{ color: "palevioletred"}} level={5} tag="a">
+  A tag
+</Heading>
+```
+
+## Props
+
+<Props of={Heading} />

@@ -1,0 +1,93 @@
+import { Props } from '@storybook/addon-docs/blocks';
+import { MeetingProvider } from '../';
+
+<Meta title="SDK Providers/MeetingProvider" />
+
+# MeetingProvider
+
+The `MeetingProvider` is the **root provider** for building a realtime meeting application. It is responsible for rendering out a series of providers and providing a `MeetingManager` class that helps integration with the Chime JavaScript SDK. The `MeetingManager` has APIs for joining, starting, and leaving a meeting.
+
+You can access the `MeetingManager` instance with the `useMeetingManager` hook.
+
+## Importing
+
+```jsx
+import { MeetingProvider } from 'amazon-chime-sdk-component-library-react';
+```
+
+## Usage
+
+1. Render the `MeetingProvider` near the root of your application.
+
+```jsx
+import React from 'react';
+import { MeetingProvider } from 'amazon-chime-sdk-component-library-react';
+
+const App = () => (
+  <MeetingProvider>
+    <MyApp />
+  </MeetingProvider>
+);
+```
+
+2. Render two `MeetingProvider`s near the root of your application with the same `MeetingManager` instance.
+
+```jsx
+import { MeetingProvider, useMeetingManager } from 'amazon-chime-sdk-component-library-react';
+
+const Root = () => {
+  const meetingManager = new MeetingManager({ logLevel: LogLevel.INFO });
+  
+  return (
+    <MeetingProvider meetingManager={meetingManager}>
+      <MyApp1 />
+    <MeetingProvider/>
+
+    <MeetingProvider meetingManager={meetingManager}>
+      <MyApp2 />
+    <MeetingProvider/>
+  ); 
+}
+```
+
+## Props
+
+<Props of={MeetingProvider} />
+
+### Prop values
+
+#### logLevel
+The level of logging you want with your meeting session. It is defined by the [LogLevel](https://aws.github.io/amazon-chime-sdk-js/enums/loglevel.html) enum in `amazon-chime-sdk-js`.
+
+```javascript
+enum LogLevel {
+  DEBUG,
+  INFO,
+  WARN,
+  ERROR,
+  OFF
+}
+```
+
+#### postLogger
+Configuration for setting up a [MeetingSessionPOSTLogger](https://aws.github.io/amazon-chime-sdk-js/classes/meetingsessionpostlogger.html).
+
+```javascript
+interface PostLogConfig = {
+  name: string;
+  batchSize: number;
+  intervalMs: number;
+  url: string;
+  logLevel: LogLevel
+}
+```
+
+#### simulcastEnabled
+To enable simulcast for the meeting pass the `simulcastEnabled` prop with value set to `true`. By default, it is `false`.
+For more information on Simulcast, check Amazon Chime JS SDK [simulcast guide](https://github.com/aws/amazon-chime-sdk-js/blob/master/guides/05_Simulcast.md).
+
+#### meetingManager
+There may be use cases to re-use the same `MeetingManager` instance accross multiple different `MeetingProvider`s.
+Hence, you can create a new `MeetingManager` instance and then pass it as a prop to your `MeetingProvider`s. If not passed,
+a new `MeetingManager` instance will be created internally with each `MeetingProvider` when rendered; and, 
+you will get the `MeetingManager` instance associated with that particular `MeetingProvider` when `useMeetingManager` hook is called.

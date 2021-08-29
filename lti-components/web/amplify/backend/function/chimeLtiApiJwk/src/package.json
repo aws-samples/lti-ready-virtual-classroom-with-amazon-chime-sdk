@@ -1,0 +1,22 @@
+{
+  "name": "chimeLtiApiJwk",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "dependencies": {
+    "crypto": "^1.0.1",
+    "got": "^11.8.2",
+    "jsonwebtoken": "^8.5.1",
+    "rasha": "^1.2.5"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": {
+    "name": "Amazon Web Services",
+    "url": "https://aws.amazon.com",
+    "organization": true
+  },
+  "license": "Apache-2.0"
+}

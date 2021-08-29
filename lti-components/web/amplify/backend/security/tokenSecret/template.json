@@ -1,0 +1,44 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "Chime LTI > Secret used by LTI client to sign its JWK tokens.",
+  "Parameters": {
+    "env": {
+      "Type": "String"
+    }
+  },
+  "Conditions": {
+    "ShouldNotCreateEnvResources": {
+      "Fn::Equals": [
+        {
+          "Ref": "env"
+        },
+        "NONE"
+      ]
+    }
+  },
+  "Resources": {
+    "ChimeLtiTokenSecret": {
+      "Type": "AWS::SecretsManager::Secret",
+      "Properties": {
+        "SecretString": "__blank__"
+      }
+    }
+  },
+  "Outputs": {
+    "Name": {
+      "Value": {
+        "Ref": "ChimeLtiTokenSecret"
+      }
+    },
+    "Arn": {
+      "Value": {
+        "Ref": "ChimeLtiTokenSecret"
+      }
+    },
+    "Region": {
+      "Value": {
+        "Ref": "AWS::Region"
+      }
+    }
+  }
+}

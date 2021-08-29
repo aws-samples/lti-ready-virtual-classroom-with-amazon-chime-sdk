@@ -23,9 +23,9 @@ experiences with Amazon Chime SDK, so educators and students can easily
 navigate to and participate in virtual classes all from their LMS --
 minimizing the need to learn a new system. We'll also demonstrate how
 educators and administrators can benefit from visibility into class
-participation metrics.\
-\
-[[Amazon Chime SDK](https://aws.amazon.com/chime/chime-sdk/) is a
+participation metrics.
+
+[Amazon Chime SDK](https://aws.amazon.com/chime/chime-sdk/) is a
 set of real-time communications components that developers can use to
 quickly add messaging, audio, video, and screen sharing capabilities to
 their web or mobile applications. Developers can leverage the same
@@ -38,15 +38,15 @@ Interoperability
 (LTI)](https://www.imsglobal.org/activity/learning-tools-interoperability)
 to integrate Amazon Chime SDK with your LMS.
 
-"The Amazon Chime SDK will help us deliver next-class stability, speed,
-Machine Learning-driven noise cancelation, reliability and exquisite
-audio-visuals. By allowing AWS to handle these areas of specialized
-expertise, we will continue to focus on pedagogically-sound
-enhancements. Additionally, with AWS's secure global infrastructure, we
-can accelerate the pace by which we bring innovations to
-market---meaning more robust, capable tools and features available to
-our customers faster than ever."  -Kathy Vieira, Chief Strategy and
-Portfolio Officer, Blackboard
+>"The Amazon Chime SDK will help us deliver next-class stability, speed,
+>Machine Learning-driven noise cancelation, reliability and exquisite
+>audio-visuals. By allowing AWS to handle these areas of specialized
+>expertise, we will continue to focus on pedagogically-sound
+>enhancements. Additionally, with AWS's secure global infrastructure, we
+>can accelerate the pace by which we bring innovations to
+>market---meaning more robust, capable tools and features available to
+>our customers faster than ever."  -Kathy Vieira, Chief Strategy and
+>Portfolio Officer, Blackboard
 
 ## How it works
 

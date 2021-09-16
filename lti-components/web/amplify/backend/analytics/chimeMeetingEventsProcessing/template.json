@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Chime LTI > Resources to capture and store Chime meeting events",
+  "Description": "Resources to capture and store Amazon Chime SDK meeting events",
   "Parameters": {
     "env": {
       "Type": "String"

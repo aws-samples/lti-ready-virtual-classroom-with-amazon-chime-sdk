@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Chime LTI > Secret used by LTI client to sign its JWK tokens.",
+  "Description": "Secret used by LTI client to sign its JWK tokens.",
   "Parameters": {
     "env": {
       "Type": "String"

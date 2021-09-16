@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Chime LTI > DynamoDB storing EventGroups instances.",
+  "Description": "Amazon DynamoDB storing EventGroups instances.",
   "Parameters": {
     "partitionKeyName": {
       "Type": "String"

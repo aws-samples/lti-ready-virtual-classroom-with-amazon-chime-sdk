@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Chime LTI > API function to maintain eventGroups entity in Dynamo",
+  "Description": "API function to maintain eventGroups entity in Amazon DynamoDB",
   "Parameters": {
     "CloudWatchRule": {
       "Type": "String",

@@ -1,18 +1,18 @@
-# Setup instructions (Canvas)
+# Setup instructions (Canvas LMS)
 
-To complete setting up the LTI tool in your Canvas instance you will need to go through the [LTI tool setup instructions](README.md) to obtain the following information:
+To complete setting up the LTI tool in your Canvas LMS instance you will need to go through the [LTI tool setup instructions](README.md) to obtain the following information:
 
-- **ltiToolAuthUri**: is the Url used by an LTI platform like Canvas to forward to the LTI plugin tool. It's the main entrance to the tool and should be used to set authentication and redirect urls in your LTI plugin configuration.
-- **ltiToolLoginUri**: is the Url used by Canvas to allow for federated login.
-- **ltiToolJwkUri**: is the Url used by Canvas to obtain an OpenId token that is used to verify signature of incoming client requests.
+- **ltiToolAuthUri**: is the Url used by an LTI platform like Canvas LMS to forward to the LTI plugin tool. It's the main entrance to the tool and should be used to set authentication and redirect urls in your LTI plugin configuration.
+- **ltiToolLoginUri**: is the Url used by Canvas LMS to allow for federated login.
+- **ltiToolJwkUri**: is the Url used by Canvas LMS to obtain an OpenId token that is used to verify signature of incoming client requests.
 
 Read step 5 of the [LTI tool setup instructions](README.md) for further instructions.
 
-## LTI plugin setup in Canvas
+## LTI plugin setup in Canvas LMS
 
-The tool needs to be set up once (by an Administrator) and can then be used by teachers.
+The tool needs to be set up once (by an Administrator) and can then be used by educators.
 
-**1.1 )** Log in to your Canvas instance as an administrator.
+**1.1 )** Log in to your Canvas LMS instance as an administrator.
 
 **1.2 )** From the left menu select **Admin** and choose **Site Admin**.
 
@@ -20,9 +20,9 @@ The tool needs to be set up once (by an Administrator) and can then be used by t
 
 **1.4 )** On the configuration page please enter the following information and then hit **Save**:
 
-- **Key name**: choose a name for the key e.g. _"Virtual Classroom with Amazon Chime"_.
+- **Key name**: choose a name for the key e.g. _"Virtual Classroom with Amazon Chime SDK meeting experience"_.
 
-- **Title**: choose a name for the key e.g. _"Virtual Classroom with Amazon Chime"_.
+- **Title**: choose a name for the key e.g. _"Virtual Classroom with Amazon Chime SDK meeting experience"_.
 
 - **Description**: enter any additional information e.g. _"Developer key for accessing Virtual classroom LTI tool"_
 
@@ -38,13 +38,13 @@ The tool needs to be set up once (by an Administrator) and can then be used by t
 
 Unfold _Additional Settings_ and set
 
-- **Privacy Level**: Public (this will let Canvas forward basic user information like display name and email address to the LTI tool. For now this is a requirement in order to show teacher's and students names in Chime meetings)
+- **Privacy Level**: Public (this will let Canvas LMS forward basic user information like display name and email address to the LTI tool. For now, this is a requirement in order to show educator's and students names in Amazon Chime SDK meeting experience).
 
 **1.5 )** Return to the developer keys list and enable the newly created developer key by changing its state from OFF to **ON**.
 
 **1.6 :** Now is the best time to return to step 8 in the [LTI tool setup instructions](README.md) in order to complete the setup by providing the requested information.
 
-Please replace _{YOUR_CANVAS_HOST_URI}_ with the actual host address of your Canvas instance.
+Please replace _{YOUR_CANVAS_HOST_URI}_ with the actual host address of your Canvas LMS instance.
 
 - **/chime/lti/{env}/ltiPlatformTokenUri**: update value to 'https://{YOUR_CANVAS_HOST_URI}/login/oauth2/token'
 - **/chime/lti/{env}/ltiPlatformJwkUri**: update value to 'https://{YOUR_CANVAS_HOST_URI}/api/lti/security/jwks'
@@ -52,15 +52,15 @@ Please replace _{YOUR_CANVAS_HOST_URI}_ with the actual host address of your Can
 
 More information on these Urls can be found in [Canvas LMS documentation](https://canvas.instructure.com/doc/api/file.lti_dev_key_config.html)
 
-**1.7 :** Now go to a course where you would like to enable the LTI tool to be available for teachers and faculity staff to add to their course offering.
+**1.7 :** Now go to a course where you would like to enable the LTI tool to be available for educators and faculity staff to add to their course offering.
 
 **1.8 :** Enter the **Settings** from the course menu on the left and go to the **Apps** tab. Create a new App by clicking on the **+ App** button.
 
 **1.9 :** From the dropdown please choose **by Client ID** as the _configuration type_ and enter the developer key that you obtained from the process of creating the developer key in step _1.6_. Next, confirm by clicking on the **Install** button.
 
-### Plugin use (Teachers)
+### Plugin use (Educators)
 
-**2.1 )** In Canvas, go to a course where you would like to add the LTI tool link. Make sure an Administrator added the tool to this course as described in step 1.8 and 1.9.
+**2.1 )** In Canvas LMS, go to a course where you would like to add the LTI tool link. Make sure an Administrator added the tool to this course as described in step 1.8 and 1.9.
 
 **2.2 )** Make sure your are on your courses **Home** page. Choose to create a new item for a module within that course by clicking on the button with the **+** symbol. If there's no module in your course yet please create one.
 

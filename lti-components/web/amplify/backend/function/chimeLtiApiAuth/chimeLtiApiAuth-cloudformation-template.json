@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Chime LTI > API function to forward provider to the LTI tool",
+  "Description": "API function to forward provider to the LTI tool",
   "Parameters": {
     "CloudWatchRule": {
       "Type": "String",

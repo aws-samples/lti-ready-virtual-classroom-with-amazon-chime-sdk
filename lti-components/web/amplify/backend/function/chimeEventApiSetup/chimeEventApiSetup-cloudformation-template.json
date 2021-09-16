@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Chime LTI > API function to set up Chime web meetings",
+  "Description": "API function to setup Amazon Chime SDK meeting experience",
   "Parameters": {
     "CloudWatchRule": {
       "Type": "String",

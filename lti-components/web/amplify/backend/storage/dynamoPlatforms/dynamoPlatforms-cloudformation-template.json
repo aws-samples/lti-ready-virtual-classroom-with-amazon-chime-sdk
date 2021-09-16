@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Chime LTI > DynamoDB storing Platforms instances.",
+  "Description": "Amazon DynamoDB storing Platforms instances.",
   "Parameters": {
     "partitionKeyName": {
       "Type": "String"

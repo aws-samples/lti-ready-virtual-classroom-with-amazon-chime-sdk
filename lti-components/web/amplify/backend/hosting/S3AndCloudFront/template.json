@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Chime LTI > Web hosting for Chime events center",
+  "Description": "Web hosting for Events Management Center ",
   "Parameters": {
     "env": {
       "Type": "String"

@@ -1,4 +1,4 @@
-# LTI-ready virtual classroom experiences with Amazon Chime SDK
+# Amazon Chime SDK Meetings Experience
 This project provides resources to roll out infrastructure to add meeting capabilities to an existing [LTI](https://www.imsglobal.org/activity/learning-tools-interoperability) tool integrating with platforms such as Moodle, Canvas, or Blackboard. 
 
 Using this sample repository, you can easily enable audio, video, and screenshare enabled meetings in your LTI based applications powered by [Amazon Chime SDK](https://aws.amazon.com/chime/chime-sdk/).
@@ -46,7 +46,6 @@ Please follow instructions provided in the [previous section](#what-you-need).
 
 ### Step 2) Amazon Chime SDK infrastructure setup (by Admin)
 This step will deploy the backend and frontend stacks for setting up a meetings application based on Amazon Chime SDK. Clone this repository in your terminal and run the following commands:
-- `git clone https://github.com/aws-samples/lti-ready-virtual-classroom-with-amazon-chime-sdk`
 - `cd lti-ready-virtual-classroom-with-amazon-chime-sdk/chime-sdk-components`
 - Deploy the bash script with the `Public JWK URL` provided by the LTI tool in [this section](#what-you-need). You can choose either of the following options to deploy:
   - Interactive setup `./deploy.sh`

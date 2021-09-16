@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Chime LTI > Authorizer to verify token access to Chime Events API.",
+  "Description": "Authorizer to verify token access",
   "Parameters": {
     "CloudWatchRule": {
       "Type": "String",

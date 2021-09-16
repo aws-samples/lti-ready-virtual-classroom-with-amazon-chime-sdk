@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Chime LTI > API for maintaining scheduled events.",
+  "Description": "API for maintaining scheduled events.",
 
   "Parameters": {
     "env": {

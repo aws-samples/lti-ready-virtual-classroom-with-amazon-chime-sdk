@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Chime LTI > API for interacting with an LTI provider like an LMS.",
+  "Description": "API for interacting with an LTI provider like an LMS.",
 
   "Parameters": {
     "env": {

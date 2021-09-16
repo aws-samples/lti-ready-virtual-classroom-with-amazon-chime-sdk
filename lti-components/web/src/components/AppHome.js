@@ -7,7 +7,6 @@ import AppJoin from './AppJoin';
 import UserInfo from './UserInfo';
 import { Nav, Navbar, NavDropdown } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faAws } from '@fortawesome/free-brands-svg-icons';
 import { faCalendarAlt, faCalendar, faCog } from '@fortawesome/free-solid-svg-icons';
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom';
 
@@ -71,7 +70,7 @@ class AppHome extends Component {
         {this.state.verified && (
           <>
             <Navbar bg="dark" variant="dark" expand="lg" sticky="top">
-              <Navbar.Brand href="#" className="ml-2"><FontAwesomeIcon icon={faAws} className="mr-2" /> Chime Events Center</Navbar.Brand>
+              <Navbar.Brand href="#" className="ml-2">Events Management Center</Navbar.Brand>
               <Navbar.Toggle aria-controls="basic-navbar-nav" />
               <Navbar.Collapse id="basic-navbar-nav">
                 <Nav className="mr-auto">

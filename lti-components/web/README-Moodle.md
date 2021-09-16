@@ -1,18 +1,18 @@
-# Setup instructions (Moodle)
+# Setup instructions (Moodle LMS)
 
-To complete setting up the LTI tool in your Moodle instance you will need to go through the [LTI tool setup instructions](README.md) to obtain the following information:
+To complete setting up the LTI tool in your Moodle LMS instance you will need to go through the [LTI tool setup instructions](README.md) to obtain the following information:
 
-- **ltiToolAuthUri**: is the Url used by an LTI platform like Moodle to forward to the LTI plugin tool. It's the main entrance to the tool and should be used to set authentication and redirect urls in your LTI plugin configuration.
-- **ltiToolLoginUri**: is the Url used by Moodle to allow for federated login.
-- **ltiToolJwkUri**: is the Url used by Moodle to obtain an OpenId token that is used to verify signature of incoming client requests.
+- **ltiToolAuthUri**: is the Url used by an LTI platform like Moodle LMS to forward to the LTI plugin tool. It's the main entrance to the tool and should be used to set authentication and redirect urls in your LTI plugin configuration.
+- **ltiToolLoginUri**: is the Url used by Moodle LMS to allow for federated login.
+- **ltiToolJwkUri**: is the Url used by Moodle LMS to obtain an OpenId token that is used to verify signature of incoming client requests.
 
 Read step 5 of the [LTI tool setup instructions](README.md) for further instructions.
 
-## LTI plugin setup in Moodle
+## LTI plugin setup in Moodle LMS
 
-The tool needs to be set up once (by an Administrator) and can then be used by teachers.
+The tool needs to be set up once (by an Administrator) and can then be used by educators.
 
-**1.1 )** Log in to your Moodle instance as an administrator.
+**1.1 )** Log in to your Moodle LMS instance as an administrator.
 
 **1.2 )** From the left menu select **Site administration**.
 
@@ -22,11 +22,11 @@ The tool needs to be set up once (by an Administrator) and can then be used by t
 
 **1.5 )** Enter the following information before clicking on **Save changes**
 
-- **Tool name**: choose a name for this tool as it will appear for teachers who choose to add it to their course pages. For instance, _"Virtual Classroom with Amazon Chime"_.
+- **Tool name**: choose a name for this tool as it will appear for educators who choose to add it to their course pages. For instance, _"Virtual Classroom with Amazon Chime SDK meeting experience"_.
 
 - **Tool URL**: Enter the _ltiToolAuthUri_ which is provided in instruction step 5
 
-- **Tool description**: Optional. Provide some details for what this tool does in order to help teachers understand the features of it.
+- **Tool description**: Optional. Provide some details for what this tool does in order to help educators understand the features of it.
 
 - **LTI version**: Select _LTI 1.3_
 
@@ -42,13 +42,13 @@ The tool needs to be set up once (by an Administrator) and can then be used by t
 
 **1.7 )** Click on the list icon of the listed tool that you just added to open its configuration details. In this window you can find all the information that is needed to update the plaform configuration as it is described in instruction step 8 of the [LTI tool setup instructions](README.md).
 
-- **/chime/lti/{env}/ltiPlatformTokenUri**: update value to what is displayed as the 'Access token URL' in Moodle
-- **/chime/lti/{env}/ltiPlatformJwkUri**: update value to what is displayed as the 'Public keyset URL' in Moodle
-- **/chime/lti/{env}/ltiPlatformAuthRequestUri**: uupdate value to what is displayed as the 'Authentication request URL' in Moodle
+- **/chime/lti/{env}/ltiPlatformTokenUri**: update value to what is displayed as the 'Access token URL' in Moodle LMS
+- **/chime/lti/{env}/ltiPlatformJwkUri**: update value to what is displayed as the 'Public keyset URL' in Moodle LMS
+- **/chime/lti/{env}/ltiPlatformAuthRequestUri**: uupdate value to what is displayed as the 'Authentication request URL' in Moodle LMS
 
-## LTI plugin use in Moodle
+## LTI plugin use in Moodle LMS
 
-Once the administrative setup is completed the plugin is available to teachers and faculty members with moderator permissions. They can now go ahead and add this plugin to their course pages.
+Once the administrative setup is completed the plugin is available to educators and faculty members with moderator permissions. They can now go ahead and add this plugin to their course pages.
 
 **2.1 )** Navigate to a course page where you'd like to add the LTI tool link.
 

@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Chime LTI > API function to provide JWK to LTI provider",
+  "Description": "API function to provide JWK to LTI provider",
   "Parameters": {
     "CloudWatchRule": {
       "Type": "String",

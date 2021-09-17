@@ -38,7 +38,7 @@ To get started with deploying this experience in your AWS account, follow the st
  **Step 3**: Configure the [LTI plugin](/lti-components/web/README.md) in your LMS 
 
 
-Here is a short [how-to video](https://youtu.be/CT6hyFC1Zds) that demonstrates the experience and setup. 
+Here is a short [how-to video](https://youtu.be/4Mvaz8OiwjU) that demonstrates the experience and setup. 
 
 
 ## Conclusion

@@ -44,7 +44,7 @@ Please follow [these instruction steps](https://docs.amplify.aws/cli/start/insta
 Navigate to the **/web** folder of this project run _amplify init_ from your commandline.
 
 ```bash
-cd web
+cd lti-components/web
 amplify init
 ```
 
@@ -87,7 +87,7 @@ If you don't see these parameter names please make sure your AWS Management Cons
 
 ### 6. Deploy the Amazon Chime SDK meeting experience
 
-Please go ahead and deploy the Amazon Chime SDK meeting experience from [Gitlab](https://gitlab.aws.dev/edtech-chime-sdk-demos/chime-meetings-stack) by following the instructions.
+Please go ahead and deploy the Amazon Chime SDK meeting experience from [Github](https://github.com/anilkumarkodali/lti-ready-virtual-classroom-with-amazon-chime-sdk/tree/main/chime-sdk-components) by following the instructions.
 
 When you are asked to provide the _Public JWK uri_ please use the value of **/chime/lti/{env}/ltiToolJwkUri** from the previous step.
 

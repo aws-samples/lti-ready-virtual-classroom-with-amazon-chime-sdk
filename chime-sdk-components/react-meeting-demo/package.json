@@ -39,9 +39,8 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@popperjs/core": "^2.2.2",
-    "aws-amplify": "^4.3.18",
+    "chokidar": "^3.5.3",
     "fast-memoize": "^2.5.2",
-    "postcss-values-parser": "^6.0.2",
     "react-popper": "^2.2.4",
     "throttle-debounce": "^2.3.0",
     "uuid": "^8.0.0"

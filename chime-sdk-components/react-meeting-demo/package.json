@@ -39,6 +39,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@popperjs/core": "^2.2.2",
+    "@storybook/core-server": "^6.4.20",
     "chokidar": "^3.5.3",
     "fast-memoize": "^2.5.2",
     "react-popper": "^2.2.4",

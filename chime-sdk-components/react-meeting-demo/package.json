@@ -48,9 +48,9 @@
   "devDependencies": {
     "@rollup/plugin-commonjs": "^13.0.0",
     "@rollup/plugin-node-resolve": "^8.0.1",
-    "@storybook/addon-knobs": "^6.1.17",
-    "@storybook/react": "^6.3.7",
-    "@storybook/storybook-deployer": "^2.8.7",
+    "@storybook/addon-knobs": "^6.4.0",
+    "@storybook/react": "^6.4.20",
+    "@storybook/storybook-deployer": "^2.8.11",
     "@testing-library/jest-dom": "^5.11.9",
     "@testing-library/react": "^11.2.5",
     "@testing-library/user-event": "^12.8.0",

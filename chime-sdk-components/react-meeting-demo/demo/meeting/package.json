@@ -10,7 +10,7 @@
     "@types/webpack-env": "^1.15.1",
     "@typescript-eslint/eslint-plugin": "^2.19.2",
     "@typescript-eslint/parser": "^2.19.2",
-    "amazon-chime-sdk-component-library-react": "file:.yalc/amazon-chime-sdk-component-library-react",
+    "amazon-chime-sdk-component-library-react": "^2.15.0",
     "amazon-chime-sdk-js": "^2.7.0",
     "aws-sdk": "^2.731.0",
     "react": "^17.0.1",
@@ -21,16 +21,15 @@
     "throttle-debounce": "^2.3.0"
   },
   "scripts": {
-    "deps": "cd ../.. && npm run build && yalc publish",
     "build:fast": "webpack --config ./webpack.config.js --mode=production --devtool=false",
-    "build": "npm run deps && yalc add amazon-chime-sdk-component-library-react && npm install && npm run start:backend_deps && npm run build:fast",
+    "build": "npm install && npm run start:backend_deps && npm run build:fast",
     "build:release": "npm install && npm run build:fast",
     "postbuild": "node check-version.js",
     "start:client": "npm run build:fast && webpack-dev-server",
     "start:backend": "node server.js",
     "start:backend_deps": "node configure.js -p",
     "start:fast": "concurrently \"npm run start:client\" \"npm run start:backend\"",
-    "start": "npm run deps && yalc add amazon-chime-sdk-component-library-react && npm install && npm run start:backend_deps && npm run start:fast",
+    "start": "npm install && npm run start:backend_deps && npm run start:fast",
     "start:release": "npm install && npm run start:fast"
   },
   "devDependencies": {
@@ -72,6 +71,6 @@
     "typescript": "^3.9.7",
     "webpack": "^4.44.1",
     "webpack-cli": "^3.3.11",
-    "webpack-dev-server": "^3.11.0"
+    "webpack-dev-server": "^4.7.4"
   }
 }

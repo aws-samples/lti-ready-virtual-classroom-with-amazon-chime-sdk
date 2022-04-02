@@ -10,18 +10,17 @@ This is the SDK react meeting demo app. It shows how to use the Amazon Chime SDK
 
 3. Navigate to the meeting demo folder: `cd demo/meeting`
 
-4. Install [yalc](https://www.npmjs.com/package/yalc) to get the latest changes from the local component library: `npm i yalc -g`
+4. Start the webpack server and node server concurrently: `npm run start`
 
-5. Start the webpack server and node server concurrently: `npm run start`
-
-6. Open https://0.0.0.0:9000/ in your browser
+5. Open https://0.0.0.0:9000/ in your browser
 
 ### Troubleshooting
 
 - You can change the `amazon-chime-sdk-js` [log level](https://aws.github.io/amazon-chime-sdk-js/enums/loglevel.html) by providing `logLevel` through URL as a query parameter with value 'warn' | 'error' | 'info' | 'debug' | 'off'.
-   ```
-    https://0.0.0.0:9000/?logLevel=debug
-    ```
+
+  ```
+   https://0.0.0.0:9000/?logLevel=debug
+  ```
 
 - `UnrecognizedClientException: The security token included in the request is invalid.` when trying to join a meeting
 

@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Amazon DynamoDB storing EventGroups instances.",
+  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"7.4.5\",\"stackType\":\"storage-DynamoDB\",\"metadata\":{}}",
   "Parameters": {
     "partitionKeyName": {
       "Type": "String"
@@ -11,14 +11,12 @@
     "env": {
       "Type": "String"
     },
-
     "sortKeyName": {
       "Type": "String"
     },
     "sortKeyType": {
       "Type": "String"
     },
-
     "tableName": {
       "Type": "String"
     }
@@ -42,7 +40,6 @@
             "AttributeName": "eventGroupId",
             "AttributeType": "S"
           },
-
           {
             "AttributeName": "platformId",
             "AttributeType": "S"
@@ -53,7 +50,6 @@
             "AttributeName": "platformId",
             "KeyType": "HASH"
           },
-
           {
             "AttributeName": "eventGroupId",
             "KeyType": "RANGE"
@@ -96,12 +92,18 @@
     },
     "Arn": {
       "Value": {
-        "Fn::GetAtt": ["DynamoDBTable", "Arn"]
+        "Fn::GetAtt": [
+          "DynamoDBTable",
+          "Arn"
+        ]
       }
     },
     "StreamArn": {
       "Value": {
-        "Fn::GetAtt": ["DynamoDBTable", "StreamArn"]
+        "Fn::GetAtt": [
+          "DynamoDBTable",
+          "StreamArn"
+        ]
       }
     },
     "PartitionKeyName": {
@@ -114,7 +116,6 @@
         "Ref": "partitionKeyType"
       }
     },
-
     "SortKeyName": {
       "Value": {
         "Ref": "sortKeyName"
@@ -125,7 +126,6 @@
         "Ref": "sortKeyType"
       }
     },
-
     "Region": {
       "Value": {
         "Ref": "AWS::Region"

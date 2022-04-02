@@ -1,37 +1,30 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "API for interacting with an LTI provider like an LMS.",
-
+  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"7.4.5\",\"stackType\":\"api-API Gateway\",\"metadata\":{}}",
   "Parameters": {
     "env": {
       "Type": "String"
     },
-
     "functionchimeLtiApiAuthName": {
       "Type": "String",
       "Default": "functionchimeLtiApiAuthName"
     },
-
     "functionchimeLtiApiAuthArn": {
       "Type": "String",
       "Default": "functionchimeLtiApiAuthArn"
     },
-
     "functionchimeLtiApiLoginName": {
       "Type": "String",
       "Default": "functionchimeLtiApiLoginName"
     },
-
     "functionchimeLtiApiLoginArn": {
       "Type": "String",
       "Default": "functionchimeLtiApiLoginArn"
     },
-
     "functionchimeLtiApiJwkName": {
       "Type": "String",
       "Default": "functionchimeLtiApiJwkName"
     },
-
     "functionchimeLtiApiJwkArn": {
       "Type": "String",
       "Default": "functionchimeLtiApiJwkArn"
@@ -88,12 +81,18 @@
               }
             ]
           },
-          "schemes": ["https"],
+          "schemes": [
+            "https"
+          ],
           "paths": {
             "/auth": {
               "options": {
-                "consumes": ["application/json"],
-                "produces": ["application/json"],
+                "consumes": [
+                  "application/json"
+                ],
+                "produces": [
+                  "application/json"
+                ],
                 "responses": {
                   "200": {
                     "description": "200 response",
@@ -129,8 +128,12 @@
                 }
               },
               "x-amazon-apigateway-any-method": {
-                "consumes": ["application/json"],
-                "produces": ["application/json"],
+                "consumes": [
+                  "application/json"
+                ],
+                "produces": [
+                  "application/json"
+                ],
                 "parameters": [
                   {
                     "in": "body",
@@ -149,7 +152,6 @@
                     }
                   }
                 },
-
                 "x-amazon-apigateway-integration": {
                   "responses": {
                     "default": {
@@ -165,11 +167,9 @@
                           "Ref": "AWS::Region"
                         },
                         ":lambda:path/2015-03-31/functions/",
-
                         {
                           "Ref": "functionchimeLtiApiAuthArn"
                         },
-
                         "/invocations"
                       ]
                     ]
@@ -180,11 +180,14 @@
                 }
               }
             },
-
             "/login": {
               "options": {
-                "consumes": ["application/json"],
-                "produces": ["application/json"],
+                "consumes": [
+                  "application/json"
+                ],
+                "produces": [
+                  "application/json"
+                ],
                 "responses": {
                   "200": {
                     "description": "200 response",
@@ -220,8 +223,12 @@
                 }
               },
               "x-amazon-apigateway-any-method": {
-                "consumes": ["application/json"],
-                "produces": ["application/json"],
+                "consumes": [
+                  "application/json"
+                ],
+                "produces": [
+                  "application/json"
+                ],
                 "parameters": [
                   {
                     "in": "body",
@@ -240,7 +247,6 @@
                     }
                   }
                 },
-
                 "x-amazon-apigateway-integration": {
                   "responses": {
                     "default": {
@@ -256,11 +262,9 @@
                           "Ref": "AWS::Region"
                         },
                         ":lambda:path/2015-03-31/functions/",
-
                         {
                           "Ref": "functionchimeLtiApiLoginArn"
                         },
-
                         "/invocations"
                       ]
                     ]
@@ -271,11 +275,14 @@
                 }
               }
             },
-
             "/jwk": {
               "options": {
-                "consumes": ["application/json"],
-                "produces": ["application/json"],
+                "consumes": [
+                  "application/json"
+                ],
+                "produces": [
+                  "application/json"
+                ],
                 "responses": {
                   "200": {
                     "description": "200 response",
@@ -311,7 +318,9 @@
                 }
               },
               "get": {
-                "produces": ["application/json"],
+                "produces": [
+                  "application/json"
+                ],
                 "responses": {
                   "200": {
                     "description": "200 response",
@@ -320,7 +329,6 @@
                     }
                   }
                 },
-
                 "x-amazon-apigateway-integration": {
                   "responses": {
                     "default": {
@@ -336,11 +344,9 @@
                           "Ref": "AWS::Region"
                         },
                         ":lambda:path/2015-03-31/functions/",
-
                         {
                           "Ref": "functionchimeLtiApiJwkArn"
                         },
-
                         "/invocations"
                       ]
                     ]
@@ -363,7 +369,9 @@
           "definitions": {
             "RequestSchema": {
               "type": "object",
-              "required": ["request"],
+              "required": [
+                "request"
+              ],
               "properties": {
                 "request": {
                   "type": "string"
@@ -373,7 +381,9 @@
             },
             "ResponseSchema": {
               "type": "object",
-              "required": ["response"],
+              "required": [
+                "response"
+              ],
               "properties": {
                 "response": {
                   "type": "string"
@@ -386,14 +396,12 @@
         "FailOnWarnings": true
       }
     },
-
     "functionchimeLtiApiAuthPermissionchimeLtiApi": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "FunctionName": {
           "Ref": "functionchimeLtiApiAuthName"
         },
-
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
@@ -418,14 +426,12 @@
         }
       }
     },
-
     "functionchimeLtiApiLoginPermissionchimeLtiApi": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "FunctionName": {
           "Ref": "functionchimeLtiApiLoginName"
         },
-
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
@@ -450,7 +456,6 @@
         }
       }
     },
-
     "functionchimeLtiApiJwkPermissionchimeLtiApi": {
       "Type": "AWS::Lambda::Permission",
       "Description": "update",
@@ -458,7 +463,6 @@
         "FunctionName": {
           "Ref": "functionchimeLtiApiJwkName"
         },
-
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
@@ -483,7 +487,6 @@
         }
       }
     },
-
     "DeploymentAPIGWchimeLtiApi": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
@@ -507,7 +510,16 @@
       "Properties": {
         "Description": "URL of the public key which is used by an LTI provider to verify client message signatures.",
         "Name": {
-          "Fn::Join": ["", ["/chime/lti/", { "Ref": "env" }, "/ltiToolJwkUri"]]
+          "Fn::Join": [
+            "",
+            [
+              "/chime/lti/",
+              {
+                "Ref": "env"
+              },
+              "/ltiToolJwkUri"
+            ]
+          ]
         },
         "Type": "String",
         "Value": {
@@ -515,15 +527,21 @@
             "",
             [
               "https://",
-              { "Ref": "chimeLtiApi" },
+              {
+                "Ref": "chimeLtiApi"
+              },
               ".execute-api.",
-              { "Ref": "AWS::Region" },
+              {
+                "Ref": "AWS::Region"
+              },
               ".amazonaws.com/",
               {
                 "Fn::If": [
                   "ShouldNotCreateEnvResources",
                   "Prod",
-                  { "Ref": "env" }
+                  {
+                    "Ref": "env"
+                  }
                 ]
               },
               "/jwk"
@@ -537,7 +555,16 @@
       "Properties": {
         "Description": "URL of the LTI plugin tool which an LTI provider send the token to.",
         "Name": {
-          "Fn::Join": ["", ["/chime/lti/", { "Ref": "env" }, "/ltiToolAuthUri"]]
+          "Fn::Join": [
+            "",
+            [
+              "/chime/lti/",
+              {
+                "Ref": "env"
+              },
+              "/ltiToolAuthUri"
+            ]
+          ]
         },
         "Type": "String",
         "Value": {
@@ -545,15 +572,21 @@
             "",
             [
               "https://",
-              { "Ref": "chimeLtiApi" },
+              {
+                "Ref": "chimeLtiApi"
+              },
               ".execute-api.",
-              { "Ref": "AWS::Region" },
+              {
+                "Ref": "AWS::Region"
+              },
               ".amazonaws.com/",
               {
                 "Fn::If": [
                   "ShouldNotCreateEnvResources",
                   "Prod",
-                  { "Ref": "env" }
+                  {
+                    "Ref": "env"
+                  }
                 ]
               },
               "/auth"
@@ -567,7 +600,16 @@
       "Properties": {
         "Description": "URL for login requests being sent out by an LTI provider.",
         "Name": {
-          "Fn::Join": ["", ["/chime/lti/", { "Ref": "env" }, "/ltiToolLoginUri"]]
+          "Fn::Join": [
+            "",
+            [
+              "/chime/lti/",
+              {
+                "Ref": "env"
+              },
+              "/ltiToolLoginUri"
+            ]
+          ]
         },
         "Type": "String",
         "Value": {
@@ -575,15 +617,21 @@
             "",
             [
               "https://",
-              { "Ref": "chimeLtiApi" },
+              {
+                "Ref": "chimeLtiApi"
+              },
               ".execute-api.",
-              { "Ref": "AWS::Region" },
+              {
+                "Ref": "AWS::Region"
+              },
               ".amazonaws.com/",
               {
                 "Fn::If": [
                   "ShouldNotCreateEnvResources",
                   "Prod",
-                  { "Ref": "env" }
+                  {
+                    "Ref": "env"
+                  }
                 ]
               },
               "/login"
@@ -601,15 +649,21 @@
           "",
           [
             "https://",
-            { "Ref": "chimeLtiApi" },
+            {
+              "Ref": "chimeLtiApi"
+            },
             ".execute-api.",
-            { "Ref": "AWS::Region" },
+            {
+              "Ref": "AWS::Region"
+            },
             ".amazonaws.com/",
             {
               "Fn::If": [
                 "ShouldNotCreateEnvResources",
                 "Prod",
-                { "Ref": "env" }
+                {
+                  "Ref": "env"
+                }
               ]
             }
           ]
@@ -619,19 +673,28 @@
     "LtiToolPublicKeyUrl": {
       "Description": "URL of the public key which is used by an LTI provider to verify client message signatures.",
       "Value": {
-        "Fn::GetAtt": ["SSMParameterJwkUri", "Value"]
+        "Fn::GetAtt": [
+          "SSMParameterJwkUri",
+          "Value"
+        ]
       }
     },
     "LtiToolAuthUrl": {
       "Description": "URL of the LTI plugin tool which an LTI provider uses to send the token to.",
       "Value": {
-        "Fn::GetAtt": ["SSMParameterAuthUri", "Value"]
+        "Fn::GetAtt": [
+          "SSMParameterAuthUri",
+          "Value"
+        ]
       }
     },
     "LtiToolLoginUrl": {
       "Description": "URL for login requests being sent out by an LTI provider.",
       "Value": {
-        "Fn::GetAtt": ["SSMParameterLoginUri", "Value"]
+        "Fn::GetAtt": [
+          "SSMParameterLoginUri",
+          "Value"
+        ]
       }
     },
     "ApiName": {
@@ -640,7 +703,9 @@
     },
     "ApiId": {
       "Description": "API ID (prefix of API URL)",
-      "Value": { "Ref": "chimeLtiApi" }
+      "Value": {
+        "Ref": "chimeLtiApi"
+      }
     }
   }
 }

@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Amazon DynamoDB storing Platforms instances.",
+  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"7.4.5\",\"stackType\":\"storage-DynamoDB\",\"metadata\":{}}",
   "Parameters": {
     "partitionKeyName": {
       "Type": "String"
@@ -11,7 +11,6 @@
     "env": {
       "Type": "String"
     },
-
     "tableName": {
       "Type": "String"
     }
@@ -79,12 +78,18 @@
     },
     "Arn": {
       "Value": {
-        "Fn::GetAtt": ["DynamoDBTable", "Arn"]
+        "Fn::GetAtt": [
+          "DynamoDBTable",
+          "Arn"
+        ]
       }
     },
     "StreamArn": {
       "Value": {
-        "Fn::GetAtt": ["DynamoDBTable", "StreamArn"]
+        "Fn::GetAtt": [
+          "DynamoDBTable",
+          "StreamArn"
+        ]
       }
     },
     "PartitionKeyName": {
@@ -97,7 +102,6 @@
         "Ref": "partitionKeyType"
       }
     },
-
     "Region": {
       "Value": {
         "Ref": "AWS::Region"

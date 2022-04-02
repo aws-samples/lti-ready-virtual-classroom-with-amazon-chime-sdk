@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Resources to capture and store Amazon Chime SDK meeting events",
+  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"7.4.5\",\"stackType\":\"analytics-S3FirehoseEventBridge\",\"metadata\":{}}",
   "Parameters": {
     "env": {
       "Type": "String"
@@ -37,7 +37,18 @@
   "Resources": {
     "S3Bucket": {
       "Type": "AWS::S3::Bucket",
-      "DeletionPolicy": "Retain"
+      "DeletionPolicy": "Retain",
+      "Properties": {
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              }
+            }
+          ]
+        }
+      }
     },
     "FirehoseDeliveryStream": {
       "Type": "AWS::KinesisFirehose::DeliveryStream",
@@ -46,7 +57,10 @@
         "DeliveryStreamType": "DirectPut",
         "S3DestinationConfiguration": {
           "BucketARN": {
-            "Fn::GetAtt": ["S3Bucket", "Arn"]
+            "Fn::GetAtt": [
+              "S3Bucket",
+              "Arn"
+            ]
           },
           "BufferingHints": {
             "IntervalInSeconds": {
@@ -56,7 +70,10 @@
           "ErrorOutputPrefix": "meetingsErrors/",
           "Prefix": "meetings/",
           "RoleARN": {
-            "Fn::GetAtt": ["FirehoseDeliveryStreamIamRole", "Arn"]
+            "Fn::GetAtt": [
+              "FirehoseDeliveryStreamIamRole",
+              "Arn"
+            ]
           }
         }
       }
@@ -97,14 +114,20 @@
                   ],
                   "Resource": [
                     {
-                      "Fn::GetAtt": ["S3Bucket", "Arn"]
+                      "Fn::GetAtt": [
+                        "S3Bucket",
+                        "Arn"
+                      ]
                     },
                     {
                       "Fn::Join": [
                         "/",
                         [
                           {
-                            "Fn::GetAtt": ["S3Bucket", "Arn"]
+                            "Fn::GetAtt": [
+                              "S3Bucket",
+                              "Arn"
+                            ]
                           },
                           "*"
                         ]
@@ -143,9 +166,15 @@
               "Statement": [
                 {
                   "Effect": "Allow",
-                  "Action": ["firehose:PutRecord", "firehose:PutRecordBatch"],
+                  "Action": [
+                    "firehose:PutRecord",
+                    "firehose:PutRecordBatch"
+                  ],
                   "Resource": {
-                    "Fn::GetAtt": ["FirehoseDeliveryStream", "Arn"]
+                    "Fn::GetAtt": [
+                      "FirehoseDeliveryStream",
+                      "Arn"
+                    ]
                   }
                 }
               ]
@@ -159,8 +188,12 @@
       "Properties": {
         "Description": "Write Chime state change events to Kinesis Firehose delivery stream",
         "EventPattern": {
-          "source": ["aws.chime"],
-          "detail-type": ["Chime Meeting State Change"],
+          "source": [
+            "aws.chime"
+          ],
+          "detail-type": [
+            "Chime Meeting State Change"
+          ],
           "detail": {
             "eventType": [
               "chime:MeetingStarted",
@@ -188,7 +221,10 @@
         "Targets": [
           {
             "Arn": {
-              "Fn::GetAtt": ["FirehoseDeliveryStream", "Arn"]
+              "Fn::GetAtt": [
+                "FirehoseDeliveryStream",
+                "Arn"
+              ]
             },
             "Id": "kinesisChimeEvents",
             "InputTransformer": {
@@ -268,130 +304,130 @@
       }
     },
     "AthenaQueryPairMeetingEvents": {
-      "Type" : "AWS::Athena::NamedQuery",
-      "Properties" : {
-          "Database" : {
-            "Ref": "GlueDatabase"
-          },
-          "WorkGroup" : {
-            "Ref": "AthenaWorkgroup"
-          },
-          "Description" : "Correlates Chime meeting events as pairs and augments them with user and event info.",
-          "Name" : "Augmented Chime meetings event pairs",
-          "QueryString" : {
-            "Fn::Sub": [
-              "SELECT  eventpair.*, events.*, users.* FROM ((( SELECT startEvent.meetingid , startEvent.attendeeid , startEvent.eventtype event , startEvent.time started   , \"min\"(\"date_diff\"('second', startEvent.time, endEvent.time)) duration , startEvent.externalmeetingid , startEvent.externaluserid FROM (${tableMeetings} startEvent LEFT JOIN ${tableMeetings} endEvent ON ((((startEvent.meetingid = endEvent.meetingid) AND (startEvent.attendeeid = endEvent.attendeeid)) AND (((((startEvent.eventtype = 'chime:MeetingStarted') AND (endEvent.eventtype = 'chime:MeetingEnded')) OR ((startEvent.eventtype = 'chime:AttendeeJoined') AND (endEvent.eventtype = 'chime:AttendeeLeft'))) OR ((startEvent.eventtype = 'chime:AttendeeContentVideoStarted') AND (endEvent.eventtype = 'chime:AttendeeContentVideoStopped'))) OR ((startEvent.eventtype = 'chime:AttendeeVideoStarted') AND (endEvent.eventtype = 'chime:AttendeeVideoStopped')))) AND (endEvent.time > startEvent.time))) WHERE (startEvent.eventtype IN ('chime:MeetingStarted', 'chime:AttendeeJoined', 'chime:AttendeeContentVideoStarted', 'chime:AttendeeVideoStarted')) GROUP BY startEvent.meetingid, startEvent.attendeeid, startEvent.externalmeetingid, startEvent.externaluserid, startEvent.eventtype, startEvent.time ORDER BY started DESC) eventPair LEFT JOIN ${tableUsers} users ON (users.id = eventPair.externaluserid)) LEFT JOIN ${tableEvents} events ON (events.externaleventid = eventPair.externalmeetingid))",
-              {
-                "tableMeetings": {
-                  "Ref": "tableNameMeetingEvents"
-                },
-                "tableEvents": {
-                  "Ref": "tableNameEvents"
-                },
-                "tableUsers": {
-                  "Ref": "tableNameUsers"
-                }
+      "Type": "AWS::Athena::NamedQuery",
+      "Properties": {
+        "Database": {
+          "Ref": "GlueDatabase"
+        },
+        "WorkGroup": {
+          "Ref": "AthenaWorkgroup"
+        },
+        "Description": "Correlates Chime meeting events as pairs and augments them with user and event info.",
+        "Name": "Augmented Chime meetings event pairs",
+        "QueryString": {
+          "Fn::Sub": [
+            "SELECT  eventpair.*, events.*, users.* FROM ((( SELECT startEvent.meetingid , startEvent.attendeeid , startEvent.eventtype event , startEvent.time started   , \"min\"(\"date_diff\"('second', startEvent.time, endEvent.time)) duration , startEvent.externalmeetingid , startEvent.externaluserid FROM (${tableMeetings} startEvent LEFT JOIN ${tableMeetings} endEvent ON ((((startEvent.meetingid = endEvent.meetingid) AND (startEvent.attendeeid = endEvent.attendeeid)) AND (((((startEvent.eventtype = 'chime:MeetingStarted') AND (endEvent.eventtype = 'chime:MeetingEnded')) OR ((startEvent.eventtype = 'chime:AttendeeJoined') AND (endEvent.eventtype = 'chime:AttendeeLeft'))) OR ((startEvent.eventtype = 'chime:AttendeeContentVideoStarted') AND (endEvent.eventtype = 'chime:AttendeeContentVideoStopped'))) OR ((startEvent.eventtype = 'chime:AttendeeVideoStarted') AND (endEvent.eventtype = 'chime:AttendeeVideoStopped')))) AND (endEvent.time > startEvent.time))) WHERE (startEvent.eventtype IN ('chime:MeetingStarted', 'chime:AttendeeJoined', 'chime:AttendeeContentVideoStarted', 'chime:AttendeeVideoStarted')) GROUP BY startEvent.meetingid, startEvent.attendeeid, startEvent.externalmeetingid, startEvent.externaluserid, startEvent.eventtype, startEvent.time ORDER BY started DESC) eventPair LEFT JOIN ${tableUsers} users ON (users.id = eventPair.externaluserid)) LEFT JOIN ${tableEvents} events ON (events.externaleventid = eventPair.externalmeetingid))",
+            {
+              "tableMeetings": {
+                "Ref": "tableNameMeetingEvents"
+              },
+              "tableEvents": {
+                "Ref": "tableNameEvents"
+              },
+              "tableUsers": {
+                "Ref": "tableNameUsers"
               }
-            ]
-          }
+            }
+          ]
         }
+      }
     },
     "AthenaQueryCreateViewPairMeetingEvents": {
-      "Type" : "AWS::Athena::NamedQuery",
-      "Properties" : {
-          "Database" : {
-            "Ref": "GlueDatabase"
-          },
-          "WorkGroup" : {
-            "Ref": "AthenaWorkgroup"
-          },
-          "Description" : "Creates view which correlates Chime meeting events as pairs and augments them with user and event info.",
-          "Name" : "Create view of augmented Chime meetings event pairs",
-          "QueryString" : {
-            "Fn::Join": [
-              " ",
-              [
-                "CREATE OR REPLACE VIEW meeting_events_paired AS",
-                {
-                  "Fn::Sub": [
-                    "SELECT  eventpair.*, events.*, users.* FROM ((( SELECT startEvent.meetingid , startEvent.attendeeid , startEvent.eventtype event , startEvent.time started   , \"min\"(\"date_diff\"('second', startEvent.time, endEvent.time)) duration , startEvent.externalmeetingid , startEvent.externaluserid FROM (${tableMeetings} startEvent LEFT JOIN ${tableMeetings} endEvent ON ((((startEvent.meetingid = endEvent.meetingid) AND (startEvent.attendeeid = endEvent.attendeeid)) AND (((((startEvent.eventtype = 'chime:MeetingStarted') AND (endEvent.eventtype = 'chime:MeetingEnded')) OR ((startEvent.eventtype = 'chime:AttendeeJoined') AND (endEvent.eventtype = 'chime:AttendeeLeft'))) OR ((startEvent.eventtype = 'chime:AttendeeContentVideoStarted') AND (endEvent.eventtype = 'chime:AttendeeContentVideoStopped'))) OR ((startEvent.eventtype = 'chime:AttendeeVideoStarted') AND (endEvent.eventtype = 'chime:AttendeeVideoStopped')))) AND (endEvent.time > startEvent.time))) WHERE (startEvent.eventtype IN ('chime:MeetingStarted', 'chime:AttendeeJoined', 'chime:AttendeeContentVideoStarted', 'chime:AttendeeVideoStarted')) GROUP BY startEvent.meetingid, startEvent.attendeeid, startEvent.externalmeetingid, startEvent.externaluserid, startEvent.eventtype, startEvent.time ORDER BY started DESC) eventPair LEFT JOIN ${tableUsers} users ON (users.id = eventPair.externaluserid)) LEFT JOIN ${tableEvents} events ON (events.externaleventid = eventPair.externalmeetingid))",
-                    {
-                      "tableMeetings": {
-                        "Ref": "tableNameMeetingEvents"
-                      },
-                      "tableEvents": {
-                        "Ref": "tableNameEvents"
-                      },
-                      "tableUsers": {
-                        "Ref": "tableNameUsers"
-                      }
-                    }
-                  ]
-                }
-              ]
-            ]
-          }
-        }
-    },
-    "AthenaQueryAggregateMeetingEvents": {
-      "Type" : "AWS::Athena::NamedQuery",
-      "Properties" : {
-          "Database" : {
-            "Ref": "GlueDatabase"
-          },
-          "WorkGroup" : {
-            "Ref": "AthenaWorkgroup"
-          },
-          "Description" : "Aggregates Chime meeting event pairs per event.",
-          "Name" : "Aggregated Chime meetings event pairs per event",
-          "QueryString" : {
-            "Fn::Sub": [
-              "SELECT eventpair.* , events.* FROM ( SELECT eventPairs.externalmeetingid, eventPairs.event, MIN(eventPairs.started) firstStart, COUNT(eventPairs.meetingId) totalCount, COUNT(distinct eventPairs.externaluserid) totalUsers, SUM(eventPairs.duration) totalDuration, MIN(eventPairs.duration) minDuration, MAX(eventPairs.duration) maxDuration FROM ( SELECT startEvent.meetingid , startEvent.attendeeid , startEvent.eventtype event , startEvent.time started , \"min\"(\"date_diff\"('second', startEvent.time, endEvent.time)) duration , startEvent.externalmeetingid , startEvent.externaluserid FROM ${tableMeetings} startEvent LEFT JOIN ${tableMeetings} endEvent ON startEvent.meetingid = endEvent.meetingid AND startEvent.attendeeid = endEvent.attendeeid AND ( (startEvent.eventtype = 'chime:MeetingStarted' AND endEvent.eventtype = 'chime:MeetingEnded') OR (startEvent.eventtype = 'chime:AttendeeJoined' AND endEvent.eventtype = 'chime:AttendeeLeft') OR (startEvent.eventtype = 'chime:AttendeeContentVideoStarted' AND endEvent.eventtype = 'chime:AttendeeContentVideoStopped') OR (startEvent.eventtype = 'chime:AttendeeVideoStarted' AND endEvent.eventtype = 'chime:AttendeeVideoStopped') ) AND endEvent.time > startEvent.time WHERE startEvent.eventtype IN ('chime:MeetingStarted', 'chime:AttendeeJoined', 'chime:AttendeeContentVideoStarted', 'chime:AttendeeVideoStarted') GROUP BY startEvent.meetingid, startEvent.attendeeid, startEvent.externalmeetingid, startEvent.externaluserid, startEvent.eventtype, startEvent.time ORDER BY started DESC ) eventPairs GROUP BY eventPairs.externalmeetingid, eventPairs.event) eventPair LEFT JOIN ${tableEvents} events ON (events.externaleventid = eventPair.externalmeetingid)",
+      "Type": "AWS::Athena::NamedQuery",
+      "Properties": {
+        "Database": {
+          "Ref": "GlueDatabase"
+        },
+        "WorkGroup": {
+          "Ref": "AthenaWorkgroup"
+        },
+        "Description": "Creates view which correlates Chime meeting events as pairs and augments them with user and event info.",
+        "Name": "Create view of augmented Chime meetings event pairs",
+        "QueryString": {
+          "Fn::Join": [
+            " ",
+            [
+              "CREATE OR REPLACE VIEW meeting_events_paired AS",
               {
-                "tableMeetings": {
-                  "Ref": "tableNameMeetingEvents"
-                },
-                "tableEvents": {
-                  "Ref": "tableNameEvents"
-                }
+                "Fn::Sub": [
+                  "SELECT  eventpair.*, events.*, users.* FROM ((( SELECT startEvent.meetingid , startEvent.attendeeid , startEvent.eventtype event , startEvent.time started   , \"min\"(\"date_diff\"('second', startEvent.time, endEvent.time)) duration , startEvent.externalmeetingid , startEvent.externaluserid FROM (${tableMeetings} startEvent LEFT JOIN ${tableMeetings} endEvent ON ((((startEvent.meetingid = endEvent.meetingid) AND (startEvent.attendeeid = endEvent.attendeeid)) AND (((((startEvent.eventtype = 'chime:MeetingStarted') AND (endEvent.eventtype = 'chime:MeetingEnded')) OR ((startEvent.eventtype = 'chime:AttendeeJoined') AND (endEvent.eventtype = 'chime:AttendeeLeft'))) OR ((startEvent.eventtype = 'chime:AttendeeContentVideoStarted') AND (endEvent.eventtype = 'chime:AttendeeContentVideoStopped'))) OR ((startEvent.eventtype = 'chime:AttendeeVideoStarted') AND (endEvent.eventtype = 'chime:AttendeeVideoStopped')))) AND (endEvent.time > startEvent.time))) WHERE (startEvent.eventtype IN ('chime:MeetingStarted', 'chime:AttendeeJoined', 'chime:AttendeeContentVideoStarted', 'chime:AttendeeVideoStarted')) GROUP BY startEvent.meetingid, startEvent.attendeeid, startEvent.externalmeetingid, startEvent.externaluserid, startEvent.eventtype, startEvent.time ORDER BY started DESC) eventPair LEFT JOIN ${tableUsers} users ON (users.id = eventPair.externaluserid)) LEFT JOIN ${tableEvents} events ON (events.externaleventid = eventPair.externalmeetingid))",
+                  {
+                    "tableMeetings": {
+                      "Ref": "tableNameMeetingEvents"
+                    },
+                    "tableEvents": {
+                      "Ref": "tableNameEvents"
+                    },
+                    "tableUsers": {
+                      "Ref": "tableNameUsers"
+                    }
+                  }
+                ]
               }
             ]
-          }
+          ]
         }
+      }
+    },
+    "AthenaQueryAggregateMeetingEvents": {
+      "Type": "AWS::Athena::NamedQuery",
+      "Properties": {
+        "Database": {
+          "Ref": "GlueDatabase"
+        },
+        "WorkGroup": {
+          "Ref": "AthenaWorkgroup"
+        },
+        "Description": "Aggregates Chime meeting event pairs per event.",
+        "Name": "Aggregated Chime meetings event pairs per event",
+        "QueryString": {
+          "Fn::Sub": [
+            "SELECT eventpair.* , events.* FROM ( SELECT eventPairs.externalmeetingid, eventPairs.event, MIN(eventPairs.started) firstStart, COUNT(eventPairs.meetingId) totalCount, COUNT(distinct eventPairs.externaluserid) totalUsers, SUM(eventPairs.duration) totalDuration, MIN(eventPairs.duration) minDuration, MAX(eventPairs.duration) maxDuration FROM ( SELECT startEvent.meetingid , startEvent.attendeeid , startEvent.eventtype event , startEvent.time started , \"min\"(\"date_diff\"('second', startEvent.time, endEvent.time)) duration , startEvent.externalmeetingid , startEvent.externaluserid FROM ${tableMeetings} startEvent LEFT JOIN ${tableMeetings} endEvent ON startEvent.meetingid = endEvent.meetingid AND startEvent.attendeeid = endEvent.attendeeid AND ( (startEvent.eventtype = 'chime:MeetingStarted' AND endEvent.eventtype = 'chime:MeetingEnded') OR (startEvent.eventtype = 'chime:AttendeeJoined' AND endEvent.eventtype = 'chime:AttendeeLeft') OR (startEvent.eventtype = 'chime:AttendeeContentVideoStarted' AND endEvent.eventtype = 'chime:AttendeeContentVideoStopped') OR (startEvent.eventtype = 'chime:AttendeeVideoStarted' AND endEvent.eventtype = 'chime:AttendeeVideoStopped') ) AND endEvent.time > startEvent.time WHERE startEvent.eventtype IN ('chime:MeetingStarted', 'chime:AttendeeJoined', 'chime:AttendeeContentVideoStarted', 'chime:AttendeeVideoStarted') GROUP BY startEvent.meetingid, startEvent.attendeeid, startEvent.externalmeetingid, startEvent.externaluserid, startEvent.eventtype, startEvent.time ORDER BY started DESC ) eventPairs GROUP BY eventPairs.externalmeetingid, eventPairs.event) eventPair LEFT JOIN ${tableEvents} events ON (events.externaleventid = eventPair.externalmeetingid)",
+            {
+              "tableMeetings": {
+                "Ref": "tableNameMeetingEvents"
+              },
+              "tableEvents": {
+                "Ref": "tableNameEvents"
+              }
+            }
+          ]
+        }
+      }
     },
     "AthenaQueryCreateViewAggregateMeetingEvents": {
-      "Type" : "AWS::Athena::NamedQuery",
-      "Properties" : {
-          "Database" : {
-            "Ref": "GlueDatabase"
-          },
-          "WorkGroup" : {
-            "Ref": "AthenaWorkgroup"
-          },
-          "Description" : "Creates view which aggregates Chime meeting event pairs per event.",
-          "Name" : "Create view of aggregated Chime meetings event pairs per event",
-          "QueryString" : {
-            "Fn::Join": [
-              " ",
-              [
-                "CREATE OR REPLACE VIEW meeting_events_paired_aggregated AS",
-                {
-                  "Fn::Sub": [
-                    "SELECT eventpair.* , events.* FROM ( SELECT eventPairs.externalmeetingid, eventPairs.event, MIN(eventPairs.started) firstStart, COUNT(eventPairs.meetingId) totalCount, COUNT(distinct eventPairs.externaluserid) totalUsers, SUM(eventPairs.duration) totalDuration, MIN(eventPairs.duration) minDuration, MAX(eventPairs.duration) maxDuration FROM ( SELECT startEvent.meetingid , startEvent.attendeeid , startEvent.eventtype event , startEvent.time started , \"min\"(\"date_diff\"('second', startEvent.time, endEvent.time)) duration , startEvent.externalmeetingid , startEvent.externaluserid FROM ${tableMeetings} startEvent LEFT JOIN ${tableMeetings} endEvent ON startEvent.meetingid = endEvent.meetingid AND startEvent.attendeeid = endEvent.attendeeid AND ( (startEvent.eventtype = 'chime:MeetingStarted' AND endEvent.eventtype = 'chime:MeetingEnded') OR (startEvent.eventtype = 'chime:AttendeeJoined' AND endEvent.eventtype = 'chime:AttendeeLeft') OR (startEvent.eventtype = 'chime:AttendeeContentVideoStarted' AND endEvent.eventtype = 'chime:AttendeeContentVideoStopped') OR (startEvent.eventtype = 'chime:AttendeeVideoStarted' AND endEvent.eventtype = 'chime:AttendeeVideoStopped') ) AND endEvent.time > startEvent.time WHERE startEvent.eventtype IN ('chime:MeetingStarted', 'chime:AttendeeJoined', 'chime:AttendeeContentVideoStarted', 'chime:AttendeeVideoStarted') GROUP BY startEvent.meetingid, startEvent.attendeeid, startEvent.externalmeetingid, startEvent.externaluserid, startEvent.eventtype, startEvent.time ORDER BY started DESC ) eventPairs GROUP BY eventPairs.externalmeetingid, eventPairs.event) eventPair LEFT JOIN ${tableEvents} events ON (events.externaleventid = eventPair.externalmeetingid)",
-                    {
-                      "tableMeetings": {
-                        "Ref": "tableNameMeetingEvents"
-                      },
-                      "tableEvents": {
-                        "Ref": "tableNameEvents"
-                      }
+      "Type": "AWS::Athena::NamedQuery",
+      "Properties": {
+        "Database": {
+          "Ref": "GlueDatabase"
+        },
+        "WorkGroup": {
+          "Ref": "AthenaWorkgroup"
+        },
+        "Description": "Creates view which aggregates Chime meeting event pairs per event.",
+        "Name": "Create view of aggregated Chime meetings event pairs per event",
+        "QueryString": {
+          "Fn::Join": [
+            " ",
+            [
+              "CREATE OR REPLACE VIEW meeting_events_paired_aggregated AS",
+              {
+                "Fn::Sub": [
+                  "SELECT eventpair.* , events.* FROM ( SELECT eventPairs.externalmeetingid, eventPairs.event, MIN(eventPairs.started) firstStart, COUNT(eventPairs.meetingId) totalCount, COUNT(distinct eventPairs.externaluserid) totalUsers, SUM(eventPairs.duration) totalDuration, MIN(eventPairs.duration) minDuration, MAX(eventPairs.duration) maxDuration FROM ( SELECT startEvent.meetingid , startEvent.attendeeid , startEvent.eventtype event , startEvent.time started , \"min\"(\"date_diff\"('second', startEvent.time, endEvent.time)) duration , startEvent.externalmeetingid , startEvent.externaluserid FROM ${tableMeetings} startEvent LEFT JOIN ${tableMeetings} endEvent ON startEvent.meetingid = endEvent.meetingid AND startEvent.attendeeid = endEvent.attendeeid AND ( (startEvent.eventtype = 'chime:MeetingStarted' AND endEvent.eventtype = 'chime:MeetingEnded') OR (startEvent.eventtype = 'chime:AttendeeJoined' AND endEvent.eventtype = 'chime:AttendeeLeft') OR (startEvent.eventtype = 'chime:AttendeeContentVideoStarted' AND endEvent.eventtype = 'chime:AttendeeContentVideoStopped') OR (startEvent.eventtype = 'chime:AttendeeVideoStarted' AND endEvent.eventtype = 'chime:AttendeeVideoStopped') ) AND endEvent.time > startEvent.time WHERE startEvent.eventtype IN ('chime:MeetingStarted', 'chime:AttendeeJoined', 'chime:AttendeeContentVideoStarted', 'chime:AttendeeVideoStarted') GROUP BY startEvent.meetingid, startEvent.attendeeid, startEvent.externalmeetingid, startEvent.externaluserid, startEvent.eventtype, startEvent.time ORDER BY started DESC ) eventPairs GROUP BY eventPairs.externalmeetingid, eventPairs.event) eventPair LEFT JOIN ${tableEvents} events ON (events.externaleventid = eventPair.externalmeetingid)",
+                  {
+                    "tableMeetings": {
+                      "Ref": "tableNameMeetingEvents"
+                    },
+                    "tableEvents": {
+                      "Ref": "tableNameEvents"
                     }
-                  ]
-                }
-              ]
+                  }
+                ]
+              }
             ]
-          }
+          ]
         }
+      }
     },
     "GlueTableMeetingEvents": {
       "Type": "AWS::Glue::Table",
@@ -633,19 +669,28 @@
     "AnalyticsBucketArn": {
       "Description": "Analytics bucket name",
       "Value": {
-        "Fn::GetAtt": ["S3Bucket", "Arn"]
+        "Fn::GetAtt": [
+          "S3Bucket",
+          "Arn"
+        ]
       }
     },
     "NamedQueryIdPairMeetingEvents": {
       "Description": "Id of named Athena query to aggregate meeting events",
       "Value": {
-        "Fn::GetAtt": ["AthenaQueryPairMeetingEvents", "NamedQueryId"]
+        "Fn::GetAtt": [
+          "AthenaQueryPairMeetingEvents",
+          "NamedQueryId"
+        ]
       }
     },
     "NamedQueryIdAggregateMeetingEvents": {
       "Description": "Id of named Athena query to aggregate meeting events",
       "Value": {
-        "Fn::GetAtt": ["AthenaQueryAggregateMeetingEvents", "NamedQueryId"]
+        "Fn::GetAtt": [
+          "AthenaQueryAggregateMeetingEvents",
+          "NamedQueryId"
+        ]
       }
     },
     "AnalyticsBucketUserFolderName": {
@@ -678,7 +723,10 @@
           "/",
           [
             {
-              "Fn::GetAtt": ["S3Bucket", "Arn"]
+              "Fn::GetAtt": [
+                "S3Bucket",
+                "Arn"
+              ]
             },
             "athena/query/results/*"
           ]
@@ -698,7 +746,10 @@
           [
             "https://",
             {
-              "Fn::GetAtt": ["S3Bucket", "DomainName"]
+              "Fn::GetAtt": [
+                "S3Bucket",
+                "DomainName"
+              ]
             }
           ]
         ]

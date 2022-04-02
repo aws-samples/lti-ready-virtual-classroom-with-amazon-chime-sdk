@@ -1,6 +1,5 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "API function to maintain the platforms entity in Amazon DynamoDB",
   "Parameters": {
     "CloudWatchRule": {
       "Type": "String",

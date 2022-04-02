@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Lambda Function resource stack creation using Amplify CLI",
+  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"7.4.5\",\"stackType\":\"function-Lambda\",\"metadata\":{}}",
   "Parameters": {
     "CloudWatchRule": {
       "Type": "String",
@@ -47,6 +47,7 @@
     "SqsAthenaQueryJobs": {
       "Type": "AWS::SQS::Queue",
       "Properties": {
+        "KmsMasterKeyId": "alias/aws/sqs",
         "MessageRetentionPeriod": 3600,
         "DelaySeconds": 60,
         "RedrivePolicy": {
@@ -61,7 +62,10 @@
       }
     },
     "SqsAthenaQueryJobsDeadletter": {
-      "Type": "AWS::SQS::Queue"
+      "Type": "AWS::SQS::Queue",
+      "Properties": {
+        "KmsMasterKeyId": "alias/aws/sqs"
+      }
     },
     "LambdaFunction": {
       "Type": "AWS::Lambda::Function",

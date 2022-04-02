@@ -1,62 +1,50 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "API for maintaining scheduled events.",
-
+  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"7.4.5\",\"stackType\":\"api-API Gateway\",\"metadata\":{}}",
   "Parameters": {
     "env": {
       "Type": "String"
     },
-
     "functionchimeEventApiPlatformName": {
       "Type": "String",
       "Default": "functionchimeEventApiPlatformName"
     },
-
     "functionchimeEventApiPlatformArn": {
       "Type": "String",
       "Default": "functionchimeEventApiPlatformArn"
     },
-
     "functionchimeEventApiEventGroupName": {
       "Type": "String",
       "Default": "functionchimeEventApiEventGroupName"
     },
-
     "functionchimeEventApiEventGroupArn": {
       "Type": "String",
       "Default": "functionchimeEventApiEventGroupArn"
     },
-
     "functionchimeEventApiEventName": {
       "Type": "String",
       "Default": "functionchimeEventApiEventName"
     },
-
     "functionchimeEventApiEventArn": {
       "Type": "String",
       "Default": "functionchimeEventApiEventArn"
     },
-
     "functionchimeEventApiJoinName": {
       "Type": "String",
       "Default": "functionchimeEventApiJoinName"
     },
-
     "functionchimeEventApiJoinArn": {
       "Type": "String",
       "Default": "functionchimeEventApiJoinArn"
     },
-
     "functionchimeEventApiSetupName": {
       "Type": "String",
       "Default": "functionchimeEventApiSetupName"
     },
-
     "functionchimeEventApiSetupArn": {
       "Type": "String",
       "Default": "functionchimeEventApiSetupArn"
     },
-
     "functionchimeEventApiAuthorizerArn": {
       "Type": "String"
     },
@@ -115,12 +103,18 @@
               }
             ]
           },
-          "schemes": ["https"],
+          "schemes": [
+            "https"
+          ],
           "paths": {
             "/platform/{proxy+}": {
               "options": {
-                "consumes": ["application/json"],
-                "produces": ["application/json"],
+                "consumes": [
+                  "application/json"
+                ],
+                "produces": [
+                  "application/json"
+                ],
                 "responses": {
                   "200": {
                     "description": "200 response",
@@ -161,8 +155,12 @@
                     "oidcAuthorizer": []
                   }
                 ],
-                "consumes": ["application/json"],
-                "produces": ["application/json"],
+                "consumes": [
+                  "application/json"
+                ],
+                "produces": [
+                  "application/json"
+                ],
                 "parameters": [
                   {
                     "in": "body",
@@ -181,7 +179,6 @@
                     }
                   }
                 },
-
                 "x-amazon-apigateway-integration": {
                   "responses": {
                     "default": {
@@ -197,11 +194,9 @@
                           "Ref": "AWS::Region"
                         },
                         ":lambda:path/2015-03-31/functions/",
-
                         {
                           "Ref": "functionchimeEventApiPlatformArn"
                         },
-
                         "/invocations"
                       ]
                     ]
@@ -212,11 +207,14 @@
                 }
               }
             },
-
             "/eventGroup/{proxy+}": {
               "options": {
-                "consumes": ["application/json"],
-                "produces": ["application/json"],
+                "consumes": [
+                  "application/json"
+                ],
+                "produces": [
+                  "application/json"
+                ],
                 "responses": {
                   "200": {
                     "description": "200 response",
@@ -257,8 +255,12 @@
                     "oidcAuthorizer": []
                   }
                 ],
-                "consumes": ["application/json"],
-                "produces": ["application/json"],
+                "consumes": [
+                  "application/json"
+                ],
+                "produces": [
+                  "application/json"
+                ],
                 "parameters": [
                   {
                     "in": "body",
@@ -277,7 +279,6 @@
                     }
                   }
                 },
-
                 "x-amazon-apigateway-integration": {
                   "responses": {
                     "default": {
@@ -293,11 +294,9 @@
                           "Ref": "AWS::Region"
                         },
                         ":lambda:path/2015-03-31/functions/",
-
                         {
                           "Ref": "functionchimeEventApiEventGroupArn"
                         },
-
                         "/invocations"
                       ]
                     ]
@@ -308,11 +307,14 @@
                 }
               }
             },
-
             "/events/{proxy+}": {
               "options": {
-                "consumes": ["application/json"],
-                "produces": ["application/json"],
+                "consumes": [
+                  "application/json"
+                ],
+                "produces": [
+                  "application/json"
+                ],
                 "responses": {
                   "200": {
                     "description": "200 response",
@@ -353,8 +355,12 @@
                     "oidcAuthorizer": []
                   }
                 ],
-                "consumes": ["application/json"],
-                "produces": ["application/json"],
+                "consumes": [
+                  "application/json"
+                ],
+                "produces": [
+                  "application/json"
+                ],
                 "parameters": [
                   {
                     "in": "body",
@@ -373,7 +379,6 @@
                     }
                   }
                 },
-
                 "x-amazon-apigateway-integration": {
                   "responses": {
                     "default": {
@@ -389,11 +394,9 @@
                           "Ref": "AWS::Region"
                         },
                         ":lambda:path/2015-03-31/functions/",
-
                         {
                           "Ref": "functionchimeEventApiEventArn"
                         },
-
                         "/invocations"
                       ]
                     ]
@@ -404,11 +407,14 @@
                 }
               }
             },
-
             "/join/{proxy+}": {
               "options": {
-                "consumes": ["application/json"],
-                "produces": ["application/json"],
+                "consumes": [
+                  "application/json"
+                ],
+                "produces": [
+                  "application/json"
+                ],
                 "responses": {
                   "200": {
                     "description": "200 response",
@@ -449,8 +455,12 @@
                     "oidcAuthorizer": []
                   }
                 ],
-                "consumes": ["application/json"],
-                "produces": ["application/json"],
+                "consumes": [
+                  "application/json"
+                ],
+                "produces": [
+                  "application/json"
+                ],
                 "parameters": [
                   {
                     "in": "body",
@@ -469,7 +479,6 @@
                     }
                   }
                 },
-
                 "x-amazon-apigateway-integration": {
                   "responses": {
                     "default": {
@@ -485,11 +494,9 @@
                           "Ref": "AWS::Region"
                         },
                         ":lambda:path/2015-03-31/functions/",
-
                         {
                           "Ref": "functionchimeEventApiJoinArn"
                         },
-
                         "/invocations"
                       ]
                     ]
@@ -500,11 +507,14 @@
                 }
               }
             },
-
             "/setup/{proxy+}": {
               "options": {
-                "consumes": ["application/json"],
-                "produces": ["application/json"],
+                "consumes": [
+                  "application/json"
+                ],
+                "produces": [
+                  "application/json"
+                ],
                 "responses": {
                   "200": {
                     "description": "200 response",
@@ -545,8 +555,12 @@
                     "oidcAuthorizer": []
                   }
                 ],
-                "consumes": ["application/json"],
-                "produces": ["application/json"],
+                "consumes": [
+                  "application/json"
+                ],
+                "produces": [
+                  "application/json"
+                ],
                 "parameters": [
                   {
                     "in": "body",
@@ -565,7 +579,6 @@
                     }
                   }
                 },
-
                 "x-amazon-apigateway-integration": {
                   "responses": {
                     "default": {
@@ -581,11 +594,9 @@
                           "Ref": "AWS::Region"
                         },
                         ":lambda:path/2015-03-31/functions/",
-
                         {
                           "Ref": "functionchimeEventApiSetupArn"
                         },
-
                         "/invocations"
                       ]
                     ]
@@ -615,11 +626,9 @@
                         "Ref": "AWS::Region"
                       },
                       ":lambda:path/2015-03-31/functions/",
-
                       {
                         "Ref": "functionchimeEventApiAuthorizerArn"
                       },
-
                       "/invocations"
                     ]
                   ]
@@ -631,7 +640,9 @@
           "definitions": {
             "RequestSchema": {
               "type": "object",
-              "required": ["request"],
+              "required": [
+                "request"
+              ],
               "properties": {
                 "request": {
                   "type": "string"
@@ -641,7 +652,9 @@
             },
             "ResponseSchema": {
               "type": "object",
-              "required": ["response"],
+              "required": [
+                "response"
+              ],
               "properties": {
                 "response": {
                   "type": "string"
@@ -654,14 +667,12 @@
         "FailOnWarnings": true
       }
     },
-
     "functionchimeEventApiPlatformPermissionchimeEventApi": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "FunctionName": {
           "Ref": "functionchimeEventApiPlatformName"
         },
-
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
@@ -686,14 +697,12 @@
         }
       }
     },
-
     "functionchimeEventApiEventGroupPermissionchimeEventApi": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "FunctionName": {
           "Ref": "functionchimeEventApiEventGroupName"
         },
-
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
@@ -718,14 +727,12 @@
         }
       }
     },
-
     "functionchimeEventApiEventPermissionchimeEventApi": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "FunctionName": {
           "Ref": "functionchimeEventApiEventName"
         },
-
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
@@ -750,14 +757,12 @@
         }
       }
     },
-
     "functionchimeEventApiJoinPermissionchimeEventApi": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "FunctionName": {
           "Ref": "functionchimeEventApiJoinName"
         },
-
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
@@ -782,14 +787,12 @@
         }
       }
     },
-
     "functionchimeEventApiSetupPermissionchimeEventApi": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "FunctionName": {
           "Ref": "functionchimeEventApiSetupName"
         },
-
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
@@ -814,14 +817,12 @@
         }
       }
     },
-
     "functiochimeAuthorizerPermissionevents": {
       "Type": "AWS::Lambda::Permission",
       "Properties": {
         "FunctionName": {
           "Ref": "functionchimeEventApiAuthorizerName"
         },
-
         "Action": "lambda:InvokeFunction",
         "Principal": "apigateway.amazonaws.com",
         "SourceArn": {
@@ -846,7 +847,6 @@
         }
       }
     },
-
     "DeploymentAPIGWchimeEventApi192c0417": {
       "Type": "AWS::ApiGateway::Deployment",
       "Properties": {
@@ -874,15 +874,21 @@
           "",
           [
             "https://",
-            { "Ref": "chimeEventApi" },
+            {
+              "Ref": "chimeEventApi"
+            },
             ".execute-api.",
-            { "Ref": "AWS::Region" },
+            {
+              "Ref": "AWS::Region"
+            },
             ".amazonaws.com/",
             {
               "Fn::If": [
                 "ShouldNotCreateEnvResources",
                 "Prod",
-                { "Ref": "env" }
+                {
+                  "Ref": "env"
+                }
               ]
             }
           ]
@@ -895,7 +901,9 @@
     },
     "ApiId": {
       "Description": "API ID (prefix of API URL)",
-      "Value": { "Ref": "chimeEventApi" }
+      "Value": {
+        "Ref": "chimeEventApi"
+      }
     }
   }
 }

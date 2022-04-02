@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Secret used by LTI client to sign its JWK tokens.",
+  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"7.4.5\",\"stackType\":\"security-SecretManager\",\"metadata\":{}}",
   "Parameters": {
     "env": {
       "Type": "String"

@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Lambda Function resource stack creation using Amplify CLI",
+  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"7.4.5\",\"stackType\":\"function-Lambda\",\"metadata\":{}}",
   "Parameters": {
     "CloudWatchRule": {
       "Type": "String",
@@ -52,15 +52,68 @@
     }
   },
   "Resources": {
+    "SqsKmsKey": {
+      "Type": "AWS::KMS::Key",
+      "Properties": {
+        "Description": "Key used to encrypt SQS queue messages.",
+        "Enabled": true,
+        "KeyPolicy": {
+          "Version": "2012-10-17",
+          "Id": "key-default-1",
+          "Statement": [
+            {
+              "Sid": "Enable IAM User Permissions",
+              "Effect": "Allow",
+              "Principal": {
+                "AWS": {
+                  "Fn::Join": [
+                    "",
+                    [
+                      "arn:aws:iam::",
+                      {
+                        "Ref": "AWS::AccountId"
+                      },
+                      ":root"
+                    ]
+                  ]
+                }
+              },
+              "Action": "kms:*",
+              "Resource": "*"
+            },
+            {
+              "Sid": "Allow CWE to use the key",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "events.amazonaws.com"
+              },
+              "Action": [
+                "kms:Decrypt",
+                "kms:GenerateDataKey"
+              ],
+              "Resource": "*"
+            }
+          ]
+        }
+      }
+    },
     "SqsChimeEventBridgeDeadletter": {
       "Type": "AWS::SQS::Queue",
-      "Description": "Catches messages which fail to be processed by EventBridge rule."
+      "Description": "Catches messages which fail to be processed by EventBridge rule.",
+      "Properties": {
+        "KmsMasterKeyId": {
+          "Ref": "SqsKmsKey"
+        }
+      }
     },
     "SqsChimeEventBridgeTriggerDeadletter": {
       "Type": "AWS::SQS::Queue",
       "Description": "Catches messages which fail to be processed by the trigger queue consumer (Lambda).",
       "Properties": {
         "FifoQueue": true,
+        "KmsMasterKeyId": {
+          "Ref": "SqsKmsKey"
+        },
         "QueueName": {
           "Fn::Join": [
             "",
@@ -90,6 +143,9 @@
               "-SqsChimeEventBridgeTrigger.fifo"
             ]
           ]
+        },
+        "KmsMasterKeyId": {
+          "Ref": "SqsKmsKey"
         },
         "FifoQueue": true,
         "ContentBasedDeduplication": true,
@@ -504,6 +560,21 @@
               "Resource": [
                 {
                   "Ref": "functionchimeMetricsResultProcessorSqsAthenaJobsQueueArn"
+                }
+              ]
+            },
+            {
+              "Sid": "",
+              "Effect": "Allow",
+              "Action": [
+                "kms:Decrypt"
+              ],
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "SqsKmsKey",
+                    "Arn"
+                  ]
                 }
               ]
             },

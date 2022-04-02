@@ -18,7 +18,7 @@ There are four key components:
 
 **What you need to start this setup:**
 
-- Installed on your local machine: Git, Node (12.x or 14.x), NPM, AWS Amplify CLI
+- Installed on your local machine: Git, Node (12.x or 14.x), NPM, AWS Amplify CLI (no later than v7.4.5 -- please read below)
 
 **What you need to complete this setup and make it functional** (but is optional for installation):
 
@@ -37,14 +37,22 @@ git clone https://github.com/aws-samples/lti-ready-virtual-classroom-with-amazon
 
 ### 2. Install and configure AWS Amplify
 
-Please follow [these instruction steps](https://docs.amplify.aws/cli/start/install) to install and set up AWS Amplify CLI on your local machine.
+Please note that this sample solution currently only deploys using Amplify CLI version 7.4.5 or older. Please run "amplify -v" from your commandline tool to check if you're ahead of this version and consider to reinstall Amplify CLI if you are using the following command:
+
+To install Amplify CLI version 7.4.5 please run:
+
+```bash
+npm i -g @aws-amplify/cli@7.4.5
+```
+
+To complete setup and configuration of Amplify CLI please follow the [Amplify installation guide](https://docs.amplify.aws/cli/start/install).
 
 ### 3. Initialize AWS Amplify project
 
 Navigate to the **/web** folder of this project run _amplify init_ from your commandline.
 
 ```bash
-cd lti-components/web
+cd lti-ready-virtual-classroom-with-amazon-chime-sdk/lti-components/web
 amplify init
 ```
 
@@ -85,9 +93,9 @@ To receive the url value from these parameters click on them on copy the assigne
 
 If you don't see these parameter names please make sure your AWS Management Console is set to the AWS region which was targeted for deployment in step 4.
 
-### 6. Deploy the Amazon Chime SDK meeting experience
+### 6. Deploy the Amazon Chime SDK Meetings Experience
 
-Please go ahead and deploy the Amazon Chime SDK meeting experience from [Github](https://github.com/aws-samples/lti-ready-virtual-classroom-with-amazon-chime-sdk/tree/main/chime-sdk-components) by following the instructions.
+Please go ahead and deploy the [Amazon Chime SDK Meetings Experience](https://github.com/aws-samples/lti-ready-virtual-classroom-with-amazon-chime-sdk/tree/main/chime-sdk-components) by following the instructions.
 
 When you are asked to provide the _Public JWK uri_ please use the value of **/chime/lti/{env}/ltiToolJwkUri** from the previous step.
 

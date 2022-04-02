@@ -1,6 +1,6 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Web hosting for Events Management Center ",
+  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"7.4.5\",\"stackType\":\"hosting-S3AndCloudFront\",\"metadata\":{}}",
   "Parameters": {
     "env": {
       "Type": "String"
@@ -28,10 +28,26 @@
         "CorsConfiguration": {
           "CorsRules": [
             {
-              "AllowedHeaders": ["Authorization", "Content-Length"],
-              "AllowedMethods": ["GET"],
-              "AllowedOrigins": ["*"],
+              "AllowedHeaders": [
+                "Authorization",
+                "Content-Length"
+              ],
+              "AllowedMethods": [
+                "GET"
+              ],
+              "AllowedOrigins": [
+                "*"
+              ],
               "MaxAge": 3000
+            }
+          ]
+        },
+        "BucketEncryption": {
+          "ServerSideEncryptionConfiguration": [
+            {
+              "ServerSideEncryptionByDefault": {
+                "SSEAlgorithm": "AES256"
+              }
             }
           ]
         }
@@ -50,7 +66,10 @@
               "Effect": "Allow",
               "Principal": {
                 "CanonicalUser": {
-                  "Fn::GetAtt": ["OriginAccessIdentity", "S3CanonicalUserId"]
+                  "Fn::GetAtt": [
+                    "OriginAccessIdentity",
+                    "S3CanonicalUserId"
+                  ]
                 }
               },
               "Action": "s3:GetObject",
@@ -84,14 +103,20 @@
     },
     "CloudFrontDistribution": {
       "Type": "AWS::CloudFront::Distribution",
-      "DependsOn": ["S3Bucket", "OriginAccessIdentity"],
+      "DependsOn": [
+        "S3Bucket",
+        "OriginAccessIdentity"
+      ],
       "Properties": {
         "DistributionConfig": {
           "HttpVersion": "http2",
           "Origins": [
             {
               "DomainName": {
-                "Fn::GetAtt": ["S3Bucket", "DomainName"]
+                "Fn::GetAtt": [
+                  "S3Bucket",
+                  "DomainName"
+                ]
               },
               "Id": "hostingS3Bucket",
               "S3OriginConfig": {
@@ -169,7 +194,10 @@
     },
     "WebsiteURL": {
       "Value": {
-        "Fn::GetAtt": ["S3Bucket", "WebsiteURL"]
+        "Fn::GetAtt": [
+          "S3Bucket",
+          "WebsiteURL"
+        ]
       },
       "Description": "URL for website hosted on S3"
     },
@@ -180,7 +208,10 @@
           [
             "https://",
             {
-              "Fn::GetAtt": ["S3Bucket", "DomainName"]
+              "Fn::GetAtt": [
+                "S3Bucket",
+                "DomainName"
+              ]
             }
           ]
         ]
@@ -194,7 +225,10 @@
     },
     "CloudFrontDomainName": {
       "Value": {
-        "Fn::GetAtt": ["CloudFrontDistribution", "DomainName"]
+        "Fn::GetAtt": [
+          "CloudFrontDistribution",
+          "DomainName"
+        ]
       }
     },
     "CloudFrontSecureURL": {
@@ -204,7 +238,10 @@
           [
             "https://",
             {
-              "Fn::GetAtt": ["CloudFrontDistribution", "DomainName"]
+              "Fn::GetAtt": [
+                "CloudFrontDistribution",
+                "DomainName"
+              ]
             }
           ]
         ]

@@ -1,6 +1,5 @@
 {
   "AWSTemplateFormatVersion": "2010-09-09",
-  "Description": "Authorizer to verify token access",
   "Parameters": {
     "CloudWatchRule": {
       "Type": "String",

@@ -15,7 +15,7 @@
     "aws-amplify": "^4.3.18",
     "bootstrap": "^4.6.0",
     "jsonwebtoken": "^8.5.1",
-    "moment": "^2.29.1",
+    "moment": "^2.29.2",
     "rasha": "^1.2.5",
     "react": "^17.0.2",
     "react-bootstrap": "^1.5.2",

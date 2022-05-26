@@ -28,7 +28,7 @@
   "devDependencies": {
     "eslint": "^7.30.0",
     "eslint-plugin-react": "^7.24.0",
-    "grunt": "^1.5.2",
+    "grunt": "^1.5.3",
     "grunt-retire": "^1.0.9"
   },
   "scripts": {

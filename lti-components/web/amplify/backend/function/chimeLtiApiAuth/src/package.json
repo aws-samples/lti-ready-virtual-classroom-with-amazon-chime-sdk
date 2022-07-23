@@ -5,7 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "crypto": "^1.0.1",
-    "got": "^11.8.2",
+    "got": "^11.8.5",
     "jsonwebtoken": "^8.5.1",
     "querystring": "^0.2.1",
     "rasha": "^1.2.5"
